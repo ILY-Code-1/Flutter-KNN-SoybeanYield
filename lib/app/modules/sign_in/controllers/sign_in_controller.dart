@@ -1,70 +1,88 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/auth/auth_controller.dart';
 import '../../../routes/app_routes.dart';
+import '../../../services/firebase_auth_service.dart';
+import '../../../services/firestore_user_service.dart';
 
 class SignInController extends GetxController {
-  final idController = TextEditingController();
+  final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final isPasswordVisible = false.obs;
   final isLoading = false.obs;
 
   final _auth = Get.find<AuthController>();
+  final _authService = FirebaseAuthService();
+  final _userService = FirestoreUserService();
 
   void togglePasswordVisibility() {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
 
   Future<void> signIn() async {
-    final id = idController.text.trim();
+    final username = usernameController.text.trim();
     final password = passwordController.text.trim();
 
-    if (id.isEmpty || password.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'ID dan Password tidak boleh kosong',
-        backgroundColor: Colors.red.shade400,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(16),
-      );
+    if (username.isEmpty || password.isEmpty) {
+      _showError('Username dan Password tidak boleh kosong');
       return;
     }
 
     isLoading.value = true;
-    await Future.delayed(const Duration(milliseconds: 800));
+    try {
+      final credential = await _authService.signIn(username, password);
+      final uid = credential?.user?.uid;
+      if (uid == null) throw Exception('Login gagal, coba lagi');
 
-    if (id == 'admin@soy.com' && password == 'admin123') {
-      _auth.login(userId: '0', username: 'Admin', role: 'admin');
-      Get.offAllNamed(AppRoutes.adminDashboard);
-    } else if (id == 'user@soy.com' && password == 'user123') {
-      _auth.login(userId: '1', username: 'User', role: 'user');
-      Get.snackbar(
-        'Info',
-        'Dashboard User belum tersedia.',
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(16),
-      );
-    } else {
-      Get.snackbar(
-        'Login Gagal',
-        'ID atau Password salah. Coba lagi.',
-        backgroundColor: Colors.red.shade400,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-        margin: const EdgeInsets.all(16),
-      );
+      final role = await _userService.getUserRole(uid);
+      if (role == null) {
+        // Firestore doc missing — sign out and surface the error
+        await _authService.signOut();
+        throw Exception('Data pengguna tidak ditemukan di sistem');
+      }
+
+      _auth.login(userId: uid, username: username, role: role);
+
+      if (role.toLowerCase() == 'admin') {
+        Get.offAllNamed(AppRoutes.adminDashboard);
+      } else {
+        // User dashboard not yet implemented
+        Get.snackbar(
+          'Info',
+          'Dashboard User belum tersedia.',
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(16),
+        );
+        await _authService.signOut();
+        _auth.logout();
+      }
+    } on FirebaseAuthException catch (e) {
+      _showError(e.message ?? 'Terjadi kesalahan, silakan coba lagi');
+    } catch (e) {
+      _showError(e.toString().replaceAll('Exception: ', ''));
+    } finally {
+      isLoading.value = false;
     }
+  }
 
-    isLoading.value = false;
+  void _showError(String message) {
+    Get.snackbar(
+      'Login Gagal',
+      message,
+      backgroundColor: Colors.red.shade400,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+      margin: const EdgeInsets.all(16),
+    );
   }
 
   @override
   void onClose() {
-    idController.dispose();
+    usernameController.dispose();
     passwordController.dispose();
     super.onClose();
   }

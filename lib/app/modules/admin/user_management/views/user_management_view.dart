@@ -24,17 +24,42 @@ class UserManagementView extends GetView<UserManagementController> {
           ),
           Expanded(
             child: Obx(() {
-              if (controller.filteredUsers.isEmpty) {
-                return Center(
-                  child: Text(
-                    'Tidak ada user ditemukan',
-                    style: GoogleFonts.poppins(
-                      color: AppColors.textSecondary,
-                      fontSize: 14,
-                    ),
+              // Loading state
+              if (controller.isLoading.value) {
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryGreen,
                   ),
                 );
               }
+
+              // Empty state
+              if (controller.filteredUsers.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Iconsax.people,
+                        size: 48,
+                        color: AppColors.textSecondary.withValues(alpha: 0.4),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        controller.searchController.text.isEmpty
+                            ? 'Belum ada pengguna'
+                            : 'User tidak ditemukan',
+                        style: GoogleFonts.poppins(
+                          color: AppColors.textSecondary,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              // User list
               return Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                 child: Container(
@@ -55,7 +80,8 @@ class UserManagementView extends GetView<UserManagementController> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: controller.filteredUsers.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      separatorBuilder: (_, __) =>
+                          const Divider(height: 1, thickness: 0.5),
                       itemBuilder: (context, index) {
                         final user = controller.filteredUsers[index];
                         return UserCardWidget(
@@ -118,6 +144,7 @@ class UserManagementView extends GetView<UserManagementController> {
   Widget _buildSearchBar() {
     return TextField(
       controller: controller.searchController,
+      onChanged: controller.searchUser,
       style: GoogleFonts.poppins(fontSize: 14),
       decoration: InputDecoration(
         hintText: 'Cari User',
@@ -127,8 +154,11 @@ class UserManagementView extends GetView<UserManagementController> {
         ),
         prefixIcon:
             const Icon(Iconsax.user, color: AppColors.primaryGreen, size: 20),
-        suffixIcon: const Icon(Iconsax.search_normal,
-            color: AppColors.primaryGreen, size: 20),
+        suffixIcon: const Icon(
+          Iconsax.search_normal,
+          color: AppColors.primaryGreen,
+          size: 20,
+        ),
         filled: true,
         fillColor: AppColors.inputBackground,
         border: OutlineInputBorder(

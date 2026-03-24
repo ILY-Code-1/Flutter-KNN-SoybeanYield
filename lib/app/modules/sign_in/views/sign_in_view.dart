@@ -73,22 +73,23 @@ class SignInView extends GetView<SignInController> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Masukan ID dan Password untuk Masuk',
+                        'Masukan Username dan Password untuk Masuk',
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           color: AppColors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 28),
-                      // ID Field
-                      _buildFieldLabel('ID Pengguna'),
+                      // Username Field
+                      _buildFieldLabel('Username'),
                       const SizedBox(height: 8),
                       TextField(
-                        controller: controller.idController,
-                        keyboardType: TextInputType.emailAddress,
+                        controller: controller.usernameController,
+                        keyboardType: TextInputType.text,
+                        textInputAction: TextInputAction.next,
                         style: GoogleFonts.poppins(fontSize: 14),
                         decoration: _inputDecoration(
-                          hint: 'Masukan ID',
+                          hint: 'Masukan Username',
                           prefixIcon: const Icon(
                             Iconsax.user,
                             color: AppColors.primaryGreen,
@@ -104,6 +105,8 @@ class SignInView extends GetView<SignInController> {
                         () => TextField(
                           controller: controller.passwordController,
                           obscureText: !controller.isPasswordVisible.value,
+                          textInputAction: TextInputAction.done,
+                          onSubmitted: (_) => controller.signIn(),
                           style: GoogleFonts.poppins(fontSize: 14),
                           decoration: _inputDecoration(
                             hint: 'Masukan Password',

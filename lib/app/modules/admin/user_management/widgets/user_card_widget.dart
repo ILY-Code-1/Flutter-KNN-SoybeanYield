@@ -17,8 +17,8 @@ class UserCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isAdmin = user.role == 'Admin';
-    final badgeColor = isAdmin ? AppColors.orange : AppColors.userBadgeGreen;
+    final badgeColor =
+        user.isAdmin ? AppColors.orange : AppColors.userBadgeGreen;
 
     return InkWell(
       onTap: onTap,
@@ -54,7 +54,7 @@ class UserCardWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                user.role,
+                user.roleDisplay,
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,

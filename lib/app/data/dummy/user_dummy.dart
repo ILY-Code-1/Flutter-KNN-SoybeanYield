@@ -5,19 +5,22 @@ class UserDummy {
         UserModel(
           id: '1',
           username: 'Alif',
-          role: 'Admin',
+          email: 'alif@soybeanyield.com',
+          role: 'admin',
           createdAt: DateTime(2026, 4, 12),
         ),
         UserModel(
           id: '2',
           username: 'Dimas',
-          role: 'User',
+          email: 'dimas@soybeanyield.com',
+          role: 'user',
           createdAt: DateTime(2026, 3, 5),
         ),
         UserModel(
           id: '3',
           username: 'Aldi',
-          role: 'User',
+          email: 'aldi@soybeanyield.com',
+          role: 'user',
           createdAt: DateTime(2026, 2, 20),
         ),
       ];

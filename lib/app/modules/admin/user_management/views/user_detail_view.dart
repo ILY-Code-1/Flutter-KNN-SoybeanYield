@@ -6,8 +6,6 @@ import 'package:intl/intl.dart';
 
 import '../../../../constants/app_colors.dart';
 import '../../../../global_widgets/admin_bottom_nav.dart';
-import '../../../../global_widgets/confirm_dialog.dart';
-import '../../../../global_widgets/primary_button.dart';
 import '../controllers/user_management_controller.dart';
 
 class UserDetailView extends GetView<UserManagementController> {
@@ -33,108 +31,137 @@ class UserDetailView extends GetView<UserManagementController> {
             ],
           ),
           padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Username
-              _fieldLabel('Username'),
-              const SizedBox(height: 8),
-              _textField(
-                controller: controller.detailUsernameController,
-                hint: 'Masukan username',
-              ),
-              const SizedBox(height: 20),
-
-              // Role
-              _fieldLabel('Role'),
-              const SizedBox(height: 8),
-              Obx(
-                () => _dropdownField(
-                  value: controller.detailSelectedRole.value,
-                  items: const ['Admin', 'User'],
-                  onChanged: (val) {
-                    if (val != null) {
-                      controller.detailSelectedRole.value = val;
-                    }
-                  },
+          child: Obx(() {
+            final isEdit = controller.selectedUser.value != null;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Username ────────────────────────────────────────────────
+                _fieldLabel('Username'),
+                const SizedBox(height: 8),
+                _textField(
+                  controller: controller.usernameController,
+                  hint: 'Masukan username',
                 ),
-              ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              // Created At
-              _fieldLabel('Created At'),
-              const SizedBox(height: 8),
-              Obx(
-                () => _textField(
-                  controller: TextEditingController(
-                    text: controller.selectedUser.value != null
-                        ? DateFormat('yyyy-MM-dd')
-                            .format(controller.selectedUser.value!.createdAt)
-                        : DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                // ── Password (ADD mode only) ─────────────────────────────────
+                if (!isEdit) ...[
+                  _fieldLabel('Password'),
+                  const SizedBox(height: 8),
+                  Obx(
+                    () => TextField(
+                      controller: controller.passwordController,
+                      obscureText: !controller.isPasswordVisible.value,
+                      style: GoogleFonts.poppins(
+                          fontSize: 14, color: AppColors.textPrimary),
+                      decoration: InputDecoration(
+                        hintText: 'Min. 6 karakter',
+                        hintStyle: GoogleFonts.poppins(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
+                        filled: true,
+                        fillColor: AppColors.inputBackground,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            controller.isPasswordVisible.value
+                                ? Iconsax.eye
+                                : Iconsax.eye_slash,
+                            color: AppColors.textSecondary,
+                            size: 20,
+                          ),
+                          onPressed: controller.togglePasswordVisibility,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                      ),
+                    ),
                   ),
-                  hint: '',
-                  enabled: false,
-                ),
-              ),
-              const SizedBox(height: 32),
+                  const SizedBox(height: 20),
+                ],
 
-              // Buttons
-              Obx(() {
-                final isEdit = controller.selectedUser.value != null;
-                if (isEdit) {
-                  return Column(
-                    children: [
-                      PrimaryButton(
-                        text: 'UPDATE',
-                        backgroundColor: AppColors.accentTeal,
-                        onPressed: () {
-                          ConfirmDialog.show(
-                            title: 'Simpan Perubahan',
-                            message: 'Apakah data sudah benar?',
-                            confirmText: 'Simpan',
-                            isDanger: false,
-                            onConfirm: controller.updateUser,
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      PrimaryButton(
-                        text: 'DELETE',
-                        backgroundColor: AppColors.deleteRed,
-                        onPressed: () {
-                          final id = controller.selectedUser.value!.id;
-                          ConfirmDialog.show(
-                            title: 'Hapus User',
-                            message: 'Tindakan ini tidak bisa dibatalkan.',
-                            confirmText: 'Hapus',
-                            isDanger: true,
-                            onConfirm: () => controller.deleteUser(id),
-                          );
-                        },
-                      ),
-                    ],
-                  );
-                } else {
-                  return PrimaryButton(
-                    text: 'TAMBAH USER',
-                    onPressed: () {
-                      Get.snackbar(
-                        'Info',
-                        'Fitur tambah user akan segera tersedia',
-                        snackPosition: SnackPosition.BOTTOM,
-                        margin: const EdgeInsets.all(16),
-                      );
+                // ── Role ────────────────────────────────────────────────────
+                _fieldLabel('Role'),
+                const SizedBox(height: 8),
+                Obx(
+                  () => _dropdownField(
+                    value: controller.selectedRole.value,
+                    items: const ['admin', 'user'],
+                    displayLabels: const {'admin': 'Admin', 'user': 'User'},
+                    onChanged: (val) {
+                      if (val != null) controller.selectedRole.value = val;
                     },
-                  );
-                }
-              }),
-            ],
-          ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // ── Created At (EDIT mode only) ──────────────────────────────
+                if (isEdit) ...[
+                  _fieldLabel('Created At'),
+                  const SizedBox(height: 8),
+                  _textField(
+                    controller: TextEditingController(
+                      text: DateFormat('yyyy-MM-dd')
+                          .format(controller.selectedUser.value!.createdAt),
+                    ),
+                    hint: '',
+                    enabled: false,
+                  ),
+                  const SizedBox(height: 32),
+                ] else
+                  const SizedBox(height: 12),
+
+                // ── Buttons ─────────────────────────────────────────────────
+                if (isEdit) ...[
+                  // UPDATE
+                  Obx(
+                    () => _actionButton(
+                      label: 'UPDATE',
+                      color: AppColors.accentTeal,
+                      isLoading: controller.isSaving.value,
+                      onPressed: () => controller
+                          .confirmUpdate(controller.selectedUser.value!.id),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // DELETE
+                  Obx(
+                    () => _actionButton(
+                      label: 'DELETE',
+                      color: AppColors.deleteRed,
+                      isLoading: controller.isSaving.value,
+                      onPressed: () => controller
+                          .confirmDelete(controller.selectedUser.value!.id),
+                    ),
+                  ),
+                ] else ...[
+                  // TAMBAH USER
+                  Obx(
+                    () => _actionButton(
+                      label: 'TAMBAH USER',
+                      color: AppColors.primaryGreen,
+                      isLoading: controller.isSaving.value,
+                      onPressed: controller.addUser,
+                    ),
+                  ),
+                ],
+              ],
+            );
+          }),
         ),
       ),
       bottomNavigationBar: const AdminBottomNav(currentIndex: 1),
     );
   }
+
+  // ── AppBar ─────────────────────────────────────────────────────────────────
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
@@ -144,26 +171,31 @@ class UserDetailView extends GetView<UserManagementController> {
         icon: const Icon(Iconsax.arrow_left, color: Colors.white),
         onPressed: () => Get.back(),
       ),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'User Detail',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+      title: Obx(() {
+        final isEdit = controller.selectedUser.value != null;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isEdit ? 'User Detail' : 'Tambah User',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
-          ),
-          Text(
-            'Kelola Pengguna dengan Mudah',
-            style: GoogleFonts.poppins(
-              fontSize: 11,
-              color: Colors.white.withValues(alpha: 0.85),
+            Text(
+              isEdit
+                  ? 'Kelola Pengguna dengan Mudah'
+                  : 'Buat akun pengguna baru',
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                color: Colors.white.withValues(alpha: 0.85),
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
       actions: [
         IconButton(
           icon: const Icon(Iconsax.logout, color: Colors.white),
@@ -173,6 +205,8 @@ class UserDetailView extends GetView<UserManagementController> {
       ],
     );
   }
+
+  // ── Reusable field widgets ─────────────────────────────────────────────────
 
   Widget _fieldLabel(String label) {
     return Text(
@@ -201,7 +235,8 @@ class UserDetailView extends GetView<UserManagementController> {
           color: AppColors.textSecondary,
         ),
         filled: true,
-        fillColor: enabled ? AppColors.inputBackground : const Color(0xFFF5F5F5),
+        fillColor:
+            enabled ? AppColors.inputBackground : const Color(0xFFF5F5F5),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -219,6 +254,7 @@ class UserDetailView extends GetView<UserManagementController> {
   Widget _dropdownField({
     required String value,
     required List<String> items,
+    required Map<String, String> displayLabels,
     required ValueChanged<String?> onChanged,
   }) {
     return Container(
@@ -240,12 +276,57 @@ class UserDetailView extends GetView<UserManagementController> {
               .map(
                 (r) => DropdownMenuItem(
                   value: r,
-                  child: Text(r, style: GoogleFonts.poppins(fontSize: 14)),
+                  child: Text(
+                    displayLabels[r] ?? r,
+                    style: GoogleFonts.poppins(fontSize: 14),
+                  ),
                 ),
               )
               .toList(),
           onChanged: onChanged,
         ),
+      ),
+    );
+  }
+
+  /// Full-width action button with integrated loading spinner.
+  Widget _actionButton({
+    required String label,
+    required Color color,
+    required bool isLoading,
+    required VoidCallback onPressed,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: isLoading ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          disabledBackgroundColor: color.withValues(alpha: 0.6),
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: isLoading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 0.5,
+                ),
+              ),
       ),
     );
   }

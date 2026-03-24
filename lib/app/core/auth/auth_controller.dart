@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
 class AuthController extends GetxService {
@@ -17,7 +18,10 @@ class AuthController extends GetxService {
     isLoggedIn.value = true;
   }
 
+  /// Clears local auth state and signs out from Firebase Auth.
   void logout() {
+    // Fire-and-forget — UI responds to local state immediately
+    FirebaseAuth.instance.signOut();
     currentUserId.value = '';
     currentUsername.value = '';
     userRole.value = '';
