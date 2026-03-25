@@ -48,17 +48,7 @@ class SignInController extends GetxController {
       if (role.toLowerCase() == 'admin') {
         Get.offAllNamed(AppRoutes.adminDashboard);
       } else {
-        // User dashboard not yet implemented
-        Get.snackbar(
-          'Info',
-          'Dashboard User belum tersedia.',
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-          margin: const EdgeInsets.all(16),
-        );
-        await _authService.signOut();
-        _auth.logout();
+        Get.offAllNamed(AppRoutes.userDashboard);
       }
     } on FirebaseAuthException catch (e) {
       _showError(e.message ?? 'Terjadi kesalahan, silakan coba lagi');

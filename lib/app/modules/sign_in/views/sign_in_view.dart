@@ -12,6 +12,8 @@ class SignInView extends GetView<SignInController> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: AppColors.primaryGreen,
       body: SafeArea(
@@ -20,14 +22,11 @@ class SignInView extends GetView<SignInController> {
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               children: [
-                const SizedBox(height: 52),
                 // Logo
-                CircleAvatar(
-                  radius: 44,
-                  backgroundColor: Colors.white.withValues(alpha: 0.2),
-                  child: const Icon(Icons.eco, size: 44, color: Colors.white),
-                ),
-                const SizedBox(height: 20),
+                Image.asset('assets/logo.webp',
+                    width: screenWidth * 0.2,
+                    height: screenHeight * 0.2,
+                    fit: BoxFit.contain),
                 Text(
                   'HALO!!',
                   style: GoogleFonts.poppins(

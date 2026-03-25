@@ -15,6 +15,13 @@ import '../modules/admin/user_management/views/user_detail_view.dart';
 import '../modules/admin/user_management/views/user_management_view.dart';
 import '../modules/sign_in/bindings/sign_in_binding.dart';
 import '../modules/sign_in/views/sign_in_view.dart';
+import '../modules/user/dashboard/bindings/user_dashboard_binding.dart';
+import '../modules/user/dashboard/views/user_dashboard_view.dart';
+import '../modules/user/history/bindings/user_history_binding.dart';
+import '../modules/user/history/views/user_history_view.dart';
+import '../modules/user/prediction/bindings/prediction_binding.dart';
+import '../modules/user/prediction/views/input_prediksi_view.dart';
+import '../modules/user/prediction/views/prediction_detail_user_view.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -26,6 +33,8 @@ class AppPages {
       page: () => const SignInView(),
       binding: SignInBinding(),
     ),
+
+    // ── Admin ─────────────────────────────────────────────────────────────────
     GetPage(
       name: AppRoutes.adminDashboard,
       page: () => const DashboardView(),
@@ -44,7 +53,6 @@ class AppPages {
       binding: UserManagementBinding(),
       middlewares: [AuthMiddleware()],
     ),
-    // ── Dataset Management ────────────────────────────────────────────────────
     GetPage(
       name: AppRoutes.adminDatasetManagement,
       page: () => const DatasetManagementView(),
@@ -63,7 +71,6 @@ class AppPages {
       binding: DatasetManagementBinding(),
       middlewares: [AuthMiddleware()],
     ),
-    // ── Prediction History ────────────────────────────────────────────────────
     GetPage(
       name: AppRoutes.adminPredictionHistory,
       page: () => const HistoryView(),
@@ -74,6 +81,32 @@ class AppPages {
       name: AppRoutes.adminPredictionDetail,
       page: () => const PredictionDetailView(),
       binding: PredictionHistoryBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
+
+    // ── User (Petani) ─────────────────────────────────────────────────────────
+    GetPage(
+      name: AppRoutes.userDashboard,
+      page: () => const UserDashboardView(),
+      binding: UserDashboardBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: AppRoutes.userInputPrediksi,
+      page: () => const InputPrediksiView(),
+      binding: PredictionBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: AppRoutes.userPredictionDetail,
+      page: () => const PredictionDetailUserView(),
+      // No binding — data passed entirely via Get.arguments
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: AppRoutes.userHistory,
+      page: () => const UserHistoryView(),
+      binding: UserHistoryBinding(),
       middlewares: [AuthMiddleware()],
     ),
   ];
