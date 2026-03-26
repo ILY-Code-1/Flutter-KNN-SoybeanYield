@@ -114,11 +114,10 @@ class UserManagementController extends GetxController {
         selectedRole.value,
       );
       if (uid == null) throw Exception('Gagal menyimpan data pengguna');
-
       await loadUsers();
-      _showSuccess('User berhasil ditambahkan');
       _clearForm();
       Get.back();
+      _showSuccess('User berhasil ditambahkan');
     } catch (e) {
       _showError(e.toString().replaceAll('Exception: ', ''));
     } finally {
@@ -188,7 +187,6 @@ class UserManagementController extends GetxController {
       await loadUsers();
       Get.back();
       _showSuccess('User berhasil dihapus');
-      Get.back();
     } catch (e) {
       _showError(e.toString().replaceAll('Exception: ', ''));
     } finally {
