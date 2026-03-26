@@ -1,32 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../constants/app_colors.dart';
+import '../../../../constants/app_text_styles.dart';
 import '../models/dataset_model.dart';
 
 class DatasetTableWidget extends StatelessWidget {
   final List<DatasetModel> datasets;
 
-  const DatasetTableWidget({super.key, required this.datasets});
+  /// Dipanggil saat icon delete ditekan. Beri null untuk menonaktifkan kolom aksi.
+  final void Function(DatasetModel dataset)? onDelete;
+
+  const DatasetTableWidget({
+    super.key,
+    required this.datasets,
+    this.onDelete,
+  });
 
   static const List<String> _headers = [
     'Suhu',
-    'Curah Hujan',
+    'Curah\nHujan',
+    'Kelembaban',
     'pH',
     'Nitrogen',
     'Fosfor',
     'Kalium',
-    'Hasil Panen',
+    'Hasil\nPanen',
+    'Aksi',
   ];
 
   static const Map<int, TableColumnWidth> _columnWidths = {
-    0: FixedColumnWidth(72),
-    1: FixedColumnWidth(104),
-    2: FixedColumnWidth(58),
-    3: FixedColumnWidth(80),
-    4: FixedColumnWidth(70),
-    5: FixedColumnWidth(70),
-    6: FixedColumnWidth(96),
+    0: FixedColumnWidth(56),  // Suhu
+    1: FixedColumnWidth(72),  // Curah Hujan
+    2: FixedColumnWidth(80),  // Kelembaban
+    3: FixedColumnWidth(48),  // pH
+    4: FixedColumnWidth(68),  // Nitrogen
+    5: FixedColumnWidth(60),  // Fosfor
+    6: FixedColumnWidth(60),  // Kalium
+    7: FixedColumnWidth(72),  // Hasil Panen
+    8: FixedColumnWidth(48),  // Aksi
   };
 
   @override
@@ -52,10 +63,7 @@ class DatasetTableWidget extends StatelessWidget {
                 child: Center(
                   child: Text(
                     'Belum ada data',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: AppColors.textSecondary,
-                    ),
+                    style: AppTextStyles.inputLabel(context),
                   ),
                 ),
               )
@@ -75,21 +83,23 @@ class DatasetTableWidget extends StatelessWidget {
                         color: Color(0xFFF1F8E9),
                       ),
                       children: _headers
-                          .map((h) => _headerCell(h))
+                          .map((h) => _headerCell(context, h))
                           .toList(),
                     ),
                     // Data rows
                     ...datasets.map(
                       (d) => TableRow(
                         children: [
-                          _dataCell(d.suhu.toStringAsFixed(0)),
-                          _dataCell(d.curahHujan.toStringAsFixed(0)),
-                          _dataCell(d.phTanah.toStringAsFixed(1)),
-                          _dataCell(d.nitrogen.toStringAsFixed(0)),
-                          _dataCell(d.fosfor.toStringAsFixed(0)),
-                          _dataCell(d.kalium.toStringAsFixed(0)),
-                          _dataCell(
+                          _dataCell(context, d.suhu.toStringAsFixed(0)),
+                          _dataCell(context, d.curahHujan.toStringAsFixed(0)),
+                          _dataCell(context, d.kelembaban.toStringAsFixed(0)),
+                          _dataCell(context, d.phTanah.toStringAsFixed(1)),
+                          _dataCell(context, d.nitrogen.toStringAsFixed(0)),
+                          _dataCell(context, d.fosfor.toStringAsFixed(0)),
+                          _dataCell(context, d.kalium.toStringAsFixed(0)),
+                          _dataCell(context,
                               '${d.hasilPanen.toStringAsFixed(2)} t'),
+                          _actionCell(context, d),
                         ],
                       ),
                     ),
@@ -100,35 +110,47 @@ class DatasetTableWidget extends StatelessWidget {
     );
   }
 
-  Widget _headerCell(String text) {
+  Widget _headerCell(BuildContext context, String text) {
     return Container(
-      height: 40,
+      height: 44,
       alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Text(
         text,
-        style: GoogleFonts.poppins(
-          fontSize: 11,
-          fontWeight: FontWeight.bold,
-          color: AppColors.textPrimary,
-        ),
+        style: AppTextStyles.detailLabel(context).copyWith(fontSize: 10),
         textAlign: TextAlign.center,
       ),
     );
   }
 
-  Widget _dataCell(String text) {
+  Widget _dataCell(BuildContext context, String text) {
     return Container(
       height: 40,
       alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Text(
         text,
-        style: GoogleFonts.poppins(
-          fontSize: 12,
-          color: AppColors.textPrimary,
-        ),
+        style: AppTextStyles.detailValue(context).copyWith(fontSize: 11),
         textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  Widget _actionCell(BuildContext context, DatasetModel dataset) {
+    return SizedBox(
+      height: 40,
+      child: Center(
+        child: IconButton(
+          icon: const Icon(
+            Icons.delete_outline_rounded,
+            color: AppColors.deleteRed,
+            size: 18,
+          ),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          tooltip: 'Hapus',
+          onPressed: onDelete != null ? () => onDelete!(dataset) : null,
+        ),
       ),
     );
   }

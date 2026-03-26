@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../../../constants/app_colors.dart';
+import '../../../../constants/app_text_styles.dart';
 import '../../../../global_widgets/admin_bottom_nav.dart';
 import '../controllers/dataset_management_controller.dart';
 import '../widgets/dataset_table_widget.dart';
@@ -20,7 +20,7 @@ class DatasetManagementView extends GetView<DatasetManagementController> {
         child: Column(
           children: [
             // ── Green header ─────────────────────────────────────────────────
-            _buildHeader(),
+            _buildHeader(context),
 
             // ── Content section ───────────────────────────────────────────────
             Transform.translate(
@@ -40,14 +40,15 @@ class DatasetManagementView extends GetView<DatasetManagementController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // .toList() memanggil iterator RxList secara internal,
-                    // yang mengakses .value → men-trigger proxy tracking GetX.
-                    // Tanpa ini, Obx tidak mendaftarkan subscription dan error "improper use".
-                    Obx(() => DatasetTableWidget(datasets: controller.datasets.toList())),
+                    Obx(() => DatasetTableWidget(
+                          datasets: controller.datasets.toList(),
+                          onDelete: (dataset) =>
+                              controller.confirmDelete(dataset.id),
+                        )),
                     const SizedBox(height: 20),
-                    _buildUploadButton(),
+                    _buildUploadButton(context),
                     const SizedBox(height: 12),
-                    _buildManualButton(),
+                    _buildManualButton(context),
                   ],
                 ),
               ),
@@ -74,7 +75,7 @@ class DatasetManagementView extends GetView<DatasetManagementController> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Container(
       width: double.infinity,
       color: AppColors.primaryGreen,
@@ -82,42 +83,29 @@ class DatasetManagementView extends GetView<DatasetManagementController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Kelola Dataset',
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
+          Text('Kelola Dataset', style: AppTextStyles.appTitle(context)),
           const SizedBox(height: 4),
           Text(
             'Kelola dataset untuk memastikan prediksi\ntetap akurat.',
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: Colors.white.withValues(alpha: 0.85),
-              height: 1.5,
-            ),
+            style: AppTextStyles.appSubtitle(context),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildUploadButton() {
+  Widget _buildUploadButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: 50,
       child: OutlinedButton.icon(
         onPressed: controller.openUploadDataset,
-        icon: const Icon(Icons.file_upload_outlined, color: AppColors.primaryGreen),
+        icon: const Icon(Icons.file_upload_outlined,
+            color: AppColors.primaryGreen),
         label: Text(
           'Upload Dataset',
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppColors.primaryGreen,
-          ),
+          style: AppTextStyles.cardLabel(context)
+              .copyWith(color: AppColors.primaryGreen),
         ),
         style: OutlinedButton.styleFrom(
           backgroundColor: AppColors.white,
@@ -130,7 +118,7 @@ class DatasetManagementView extends GetView<DatasetManagementController> {
     );
   }
 
-  Widget _buildManualButton() {
+  Widget _buildManualButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: 50,
@@ -138,9 +126,8 @@ class DatasetManagementView extends GetView<DatasetManagementController> {
         onPressed: controller.openManualInput,
         icon: const Icon(Icons.add_rounded, color: Color(0xFF212121)),
         label: Text(
-          '+ Tambah Data Manual',
-          style: GoogleFonts.poppins(
-            fontSize: 14,
+          'Tambah Data Manual',
+          style: AppTextStyles.cardLabel(context).copyWith(
             fontWeight: FontWeight.bold,
             color: const Color(0xFF212121),
           ),

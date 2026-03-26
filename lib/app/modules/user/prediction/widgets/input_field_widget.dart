@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../constants/app_colors.dart';
+import '../../../../constants/app_text_styles.dart';
 
 class InputFieldWidget extends StatelessWidget {
   final String label;
@@ -24,26 +24,16 @@ class InputFieldWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
-        ),
+        Text(label, style: AppTextStyles.inputFieldLabel(context)),
         const SizedBox(height: 4),
         TextField(
           controller: controller,
           keyboardType: keyboardType,
           textInputAction: textInputAction,
-          style: GoogleFonts.poppins(fontSize: 14),
+          style: AppTextStyles.inputFieldText(context),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: GoogleFonts.poppins(
-              fontSize: 13,
-              color: AppColors.textSecondary,
-            ),
+            hintStyle: AppTextStyles.inputFieldHint(context),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 12,

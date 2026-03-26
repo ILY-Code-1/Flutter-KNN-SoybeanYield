@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:iconsax/iconsax.dart';
-
 import '../../../../constants/app_colors.dart';
-import '../../../../global_widgets/admin_bottom_nav.dart';
+import '../../../../constants/app_text_styles.dart';
+import '../../../../global_widgets/fullscreen_app_bar.dart';
 import '../controllers/dataset_management_controller.dart';
 
 class DatasetUploadView extends GetView<DatasetManagementController> {
@@ -14,12 +12,12 @@ class DatasetUploadView extends GetView<DatasetManagementController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
+      appBar: const FullscreenAppBar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
             // ── Green header ─────────────────────────────────────────────────
-            _buildHeader(),
+            _buildHeader(context),
 
             // ── Content section ───────────────────────────────────────────────
             Transform.translate(
@@ -49,9 +47,9 @@ class DatasetUploadView extends GetView<DatasetManagementController> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // ── Upload zone ───────────────────────────────────────
+                      // ── Upload zone — tap untuk buka file manager ──────────
                       GestureDetector(
-                        onTap: controller.simulateUpload,
+                        onTap: controller.pickFile,
                         child: Container(
                           height: 200,
                           decoration: BoxDecoration(
@@ -68,23 +66,31 @@ class DatasetUploadView extends GetView<DatasetManagementController> {
                               const Icon(
                                 Icons.cloud_upload_outlined,
                                 size: 52,
-                                color: AppColors.textPrimary,
+                                color: AppColors.primaryGreen,
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                'Upload Dataset',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textPrimary,
-                                ),
+                                'Pilih File Dataset',
+                                style: AppTextStyles.sectionTitle(context)
+                                    .copyWith(color: AppColors.textPrimary),
                               ),
                               const SizedBox(height: 6),
                               Text(
-                                'Tap untuk memilih file .txt',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  color: AppColors.textSecondary,
+                                'Tap untuk membuka file manager (.txt / .csv)',
+                                style: AppTextStyles.inputLabel(context),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 10),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryGreen,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  'Buka File Manager',
+                                  style: AppTextStyles.badgeText(context),
                                 ),
                               ),
                             ],
@@ -121,16 +127,15 @@ class DatasetUploadView extends GetView<DatasetManagementController> {
                               Expanded(
                                 child: Text(
                                   fileName,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.primaryGreen,
-                                  ),
+                                  style: AppTextStyles.detailLabel(context)
+                                      .copyWith(color: AppColors.primaryGreen),
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () =>
-                                    controller.selectedFileName.value = null,
+                                onTap: () {
+                                  controller.selectedFileName.value = null;
+                                  controller.selectedFilePath.value = null;
+                                },
                                 child: const Icon(
                                   Icons.close_rounded,
                                   color: AppColors.textSecondary,
@@ -158,12 +163,8 @@ class DatasetUploadView extends GetView<DatasetManagementController> {
                           ),
                           child: Text(
                             'SIMPAN DATASET',
-                            style: GoogleFonts.poppins(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF212121),
-                              letterSpacing: 1.0,
-                            ),
+                            style: AppTextStyles.buttonText(context)
+                                .copyWith(color: const Color(0xFF212121)),
                           ),
                         ),
                       ),
@@ -175,29 +176,10 @@ class DatasetUploadView extends GetView<DatasetManagementController> {
           ],
         ),
       ),
-      bottomNavigationBar: const AdminBottomNav(currentIndex: 2),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.primaryGreen,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Iconsax.arrow_left, color: Colors.white),
-        onPressed: () => Get.back(),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Iconsax.logout, color: Colors.white),
-          onPressed: controller.logout,
-          tooltip: 'Logout',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Container(
       width: double.infinity,
       color: AppColors.primaryGreen,
@@ -205,21 +187,11 @@ class DatasetUploadView extends GetView<DatasetManagementController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Upload Dataset',
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
+          Text('Upload Dataset', style: AppTextStyles.appTitle(context)),
           const SizedBox(height: 4),
           Text(
-            'Masukan dataset dalam bentuk file .txt',
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: Colors.white.withValues(alpha: 0.85),
-            ),
+            'Pilih file dataset dari penyimpanan perangkat.',
+            style: AppTextStyles.appSubtitle(context),
           ),
         ],
       ),

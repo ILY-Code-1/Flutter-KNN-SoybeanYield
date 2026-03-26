@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../constants/app_colors.dart';
-import '../../../../global_widgets/admin_bottom_nav.dart';
+import '../../../../constants/app_text_styles.dart';
+import '../../../../global_widgets/fullscreen_app_bar.dart';
 import '../controllers/user_management_controller.dart';
 
 class UserDetailView extends GetView<UserManagementController> {
@@ -15,12 +15,12 @@ class UserDetailView extends GetView<UserManagementController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
+      appBar: const FullscreenAppBar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
             // ── Green header ─────────────────────────────────────────────────
-            _buildHeader(),
+            _buildHeader(context),
 
             // ── Content section ───────────────────────────────────────────────
             Transform.translate(
@@ -53,9 +53,10 @@ class UserDetailView extends GetView<UserManagementController> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // ── Username ─────────────────────────────────────────
-                        _fieldLabel('Username'),
+                        _fieldLabel(context, 'Username'),
                         const SizedBox(height: 8),
                         _textField(
+                          context: context,
                           controller: controller.usernameController,
                           hint: 'Masukan username',
                         ),
@@ -63,20 +64,17 @@ class UserDetailView extends GetView<UserManagementController> {
 
                         // ── Password (ADD mode only) ──────────────────────────
                         if (!isEdit) ...[
-                          _fieldLabel('Password'),
+                          _fieldLabel(context, 'Password'),
                           const SizedBox(height: 8),
                           Obx(
                             () => TextField(
                               controller: controller.passwordController,
                               obscureText: !controller.isPasswordVisible.value,
-                              style: GoogleFonts.poppins(
-                                  fontSize: 14, color: AppColors.textPrimary),
+                              style: AppTextStyles.inputFieldText(context),
                               decoration: InputDecoration(
                                 hintText: 'Min. 6 karakter',
-                                hintStyle: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  color: AppColors.textSecondary,
-                                ),
+                                hintStyle:
+                                    AppTextStyles.inputFieldHint(context),
                                 filled: true,
                                 fillColor: AppColors.inputBackground,
                                 suffixIcon: IconButton(
@@ -87,7 +85,8 @@ class UserDetailView extends GetView<UserManagementController> {
                                     color: AppColors.textSecondary,
                                     size: 20,
                                   ),
-                                  onPressed: controller.togglePasswordVisibility,
+                                  onPressed:
+                                      controller.togglePasswordVisibility,
                                 ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -104,10 +103,11 @@ class UserDetailView extends GetView<UserManagementController> {
                         ],
 
                         // ── Role ─────────────────────────────────────────────
-                        _fieldLabel('Role'),
+                        _fieldLabel(context, 'Role'),
                         const SizedBox(height: 8),
                         Obx(
                           () => _dropdownField(
+                            context: context,
                             value: controller.selectedRole.value,
                             items: const ['admin', 'user'],
                             displayLabels: const {
@@ -115,7 +115,8 @@ class UserDetailView extends GetView<UserManagementController> {
                               'user': 'User'
                             },
                             onChanged: (val) {
-                              if (val != null) controller.selectedRole.value = val;
+                              if (val != null)
+                                controller.selectedRole.value = val;
                             },
                           ),
                         ),
@@ -123,9 +124,10 @@ class UserDetailView extends GetView<UserManagementController> {
 
                         // ── Created At (EDIT mode only) ───────────────────────
                         if (isEdit) ...[
-                          _fieldLabel('Created At'),
+                          _fieldLabel(context, 'Created At'),
                           const SizedBox(height: 8),
                           _textField(
+                            context: context,
                             controller: TextEditingController(
                               text: DateFormat('yyyy-MM-dd').format(
                                   controller.selectedUser.value!.createdAt),
@@ -141,6 +143,7 @@ class UserDetailView extends GetView<UserManagementController> {
                         if (isEdit) ...[
                           Obx(
                             () => _actionButton(
+                              context: context,
                               label: 'UPDATE',
                               color: AppColors.accentTeal,
                               isLoading: controller.isSaving.value,
@@ -151,6 +154,7 @@ class UserDetailView extends GetView<UserManagementController> {
                           const SizedBox(height: 12),
                           Obx(
                             () => _actionButton(
+                              context: context,
                               label: 'DELETE',
                               color: AppColors.deleteRed,
                               isLoading: controller.isSaving.value,
@@ -161,6 +165,7 @@ class UserDetailView extends GetView<UserManagementController> {
                         ] else ...[
                           Obx(
                             () => _actionButton(
+                              context: context,
                               label: 'TAMBAH USER',
                               color: AppColors.primaryGreen,
                               isLoading: controller.isSaving.value,
@@ -177,33 +182,12 @@ class UserDetailView extends GetView<UserManagementController> {
           ],
         ),
       ),
-      bottomNavigationBar: const AdminBottomNav(currentIndex: 1),
-    );
-  }
-
-  // ── AppBar ──────────────────────────────────────────────────────────────────
-
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.primaryGreen,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Iconsax.arrow_left, color: Colors.white),
-        onPressed: () => Get.back(),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Iconsax.logout, color: Colors.white),
-          onPressed: controller.logout,
-          tooltip: 'Logout',
-        ),
-      ],
     );
   }
 
   // ── Green header ────────────────────────────────────────────────────────────
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Obx(() {
       final isEdit = controller.selectedUser.value != null;
       return Container(
@@ -215,19 +199,14 @@ class UserDetailView extends GetView<UserManagementController> {
           children: [
             Text(
               isEdit ? 'User Detail' : 'Tambah User',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+              style: AppTextStyles.appTitle(context),
             ),
             const SizedBox(height: 4),
             Text(
-              isEdit ? 'Kelola pengguna dengan mudah.' : 'Buat akun pengguna baru.',
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                color: Colors.white.withValues(alpha: 0.85),
-              ),
+              isEdit
+                  ? 'Kelola pengguna dengan mudah.'
+                  : 'Buat akun pengguna baru.',
+              style: AppTextStyles.appSubtitle(context),
             ),
           ],
         ),
@@ -237,18 +216,12 @@ class UserDetailView extends GetView<UserManagementController> {
 
   // ── Reusable field widgets ──────────────────────────────────────────────────
 
-  Widget _fieldLabel(String label) {
-    return Text(
-      label,
-      style: GoogleFonts.poppins(
-        fontSize: 13,
-        fontWeight: FontWeight.w500,
-        color: AppColors.textPrimary,
-      ),
-    );
+  Widget _fieldLabel(BuildContext context, String label) {
+    return Text(label, style: AppTextStyles.detailLabel(context));
   }
 
   Widget _textField({
+    required BuildContext context,
     required TextEditingController controller,
     required String hint,
     bool enabled = true,
@@ -256,15 +229,13 @@ class UserDetailView extends GetView<UserManagementController> {
     return TextField(
       controller: controller,
       enabled: enabled,
-      style: GoogleFonts.poppins(fontSize: 14, color: AppColors.textPrimary),
+      style: AppTextStyles.inputFieldText(context),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.poppins(
-          fontSize: 13,
-          color: AppColors.textSecondary,
-        ),
+        hintStyle: AppTextStyles.inputFieldHint(context),
         filled: true,
-        fillColor: enabled ? AppColors.inputBackground : const Color(0xFFF5F5F5),
+        fillColor:
+            enabled ? AppColors.inputBackground : const Color(0xFFF5F5F5),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -280,6 +251,7 @@ class UserDetailView extends GetView<UserManagementController> {
   }
 
   Widget _dropdownField({
+    required BuildContext context,
     required String value,
     required List<String> items,
     required Map<String, String> displayLabels,
@@ -295,10 +267,7 @@ class UserDetailView extends GetView<UserManagementController> {
         child: DropdownButton<String>(
           value: value,
           isExpanded: true,
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            color: AppColors.textPrimary,
-          ),
+          style: AppTextStyles.inputFieldText(context),
           dropdownColor: AppColors.white,
           items: items
               .map(
@@ -306,7 +275,7 @@ class UserDetailView extends GetView<UserManagementController> {
                   value: r,
                   child: Text(
                     displayLabels[r] ?? r,
-                    style: GoogleFonts.poppins(fontSize: 14),
+                    style: AppTextStyles.inputFieldText(context),
                   ),
                 ),
               )
@@ -318,6 +287,7 @@ class UserDetailView extends GetView<UserManagementController> {
   }
 
   Widget _actionButton({
+    required BuildContext context,
     required String label,
     required Color color,
     required bool isLoading,
@@ -347,12 +317,8 @@ class UserDetailView extends GetView<UserManagementController> {
               )
             : Text(
                 label,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 0.5,
-                ),
+                style: AppTextStyles.buttonText(context)
+                    .copyWith(letterSpacing: 0.5),
               ),
       ),
     );

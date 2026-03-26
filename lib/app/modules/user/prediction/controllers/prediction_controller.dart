@@ -8,7 +8,7 @@ class PredictionController extends GetxController {
   final RxBool isLoading = false.obs;
   final Rxn<UserPredictionModel> result = Rxn<UserPredictionModel>();
 
-  // ── Form controllers (8 fields) ───────────────────────────────────────────
+  // ── Form controllers (7 fields) ───────────────────────────────────────────
   final suhuController = TextEditingController();
   final curahHujanController = TextEditingController();
   final kelembabanController = TextEditingController();
@@ -16,13 +16,10 @@ class PredictionController extends GetxController {
   final nitrogenController = TextEditingController();
   final fosforController = TextEditingController();
   final kaliumController = TextEditingController();
-  final hasilPanenController = TextEditingController(); // reference / label field
 
   // ── KNN Simulation ────────────────────────────────────────────────────────
 
   /// Dummy KNN approximation — replace with a real K-NN implementation later.
-  /// Parameters match the training feature set; [hasilPanen] is a reference
-  /// label and is not consumed by this simplified formula.
   double simulateKNN({
     required double suhu,
     required double curahHujan,
@@ -31,7 +28,6 @@ class PredictionController extends GetxController {
     required double nitrogen,
     required double fosfor,
     required double kalium,
-    required double hasilPanen,
   }) {
     return ((suhu * 0.1) +
             (curahHujan * 0.003) +
@@ -50,7 +46,6 @@ class PredictionController extends GetxController {
     final nitrogen = double.tryParse(nitrogenController.text.trim());
     final fosfor = double.tryParse(fosforController.text.trim());
     final kalium = double.tryParse(kaliumController.text.trim());
-    final hasilPanen = double.tryParse(hasilPanenController.text.trim());
 
     if (suhu == null ||
         curahHujan == null ||
@@ -58,8 +53,7 @@ class PredictionController extends GetxController {
         phTanah == null ||
         nitrogen == null ||
         fosfor == null ||
-        kalium == null ||
-        hasilPanen == null) {
+        kalium == null) {
       Get.snackbar(
         'Data Tidak Lengkap',
         'Semua field harus diisi dengan angka yang valid',
@@ -84,7 +78,6 @@ class PredictionController extends GetxController {
       nitrogen: nitrogen,
       fosfor: fosfor,
       kalium: kalium,
-      hasilPanen: hasilPanen,
     );
 
     result.value = UserPredictionModel(
@@ -116,7 +109,6 @@ class PredictionController extends GetxController {
     nitrogenController.clear();
     fosforController.clear();
     kaliumController.clear();
-    hasilPanenController.clear();
     result.value = null;
   }
 
@@ -129,7 +121,6 @@ class PredictionController extends GetxController {
     nitrogenController.dispose();
     fosforController.dispose();
     kaliumController.dispose();
-    hasilPanenController.dispose();
     super.onClose();
   }
 }

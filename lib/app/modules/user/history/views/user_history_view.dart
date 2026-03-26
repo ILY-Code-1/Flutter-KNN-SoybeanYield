@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 
 import '../../../../constants/app_colors.dart';
+import '../../../../constants/app_text_styles.dart';
 import '../../../../global_widgets/user_bottom_nav.dart';
 import '../../../../routes/app_routes.dart';
 import '../controllers/user_history_controller.dart';
@@ -21,7 +21,7 @@ class UserHistoryView extends GetView<UserHistoryController> {
         child: Column(
           children: [
             // ── Green header ─────────────────────────────────────────────────
-            _buildHeader(),
+            _buildHeader(context),
 
             // ── Content section — radius atas, overlap ke header ─────────────
             Transform.translate(
@@ -53,10 +53,8 @@ class UserHistoryView extends GetView<UserHistoryController> {
                         const SizedBox(height: 12),
                         Text(
                           'Belum ada riwayat prediksi',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
-                          ),
+                          style: AppTextStyles.inputLabel(context)
+                              .copyWith(fontSize: 14),
                         ),
                       ],
                     );
@@ -109,7 +107,7 @@ class UserHistoryView extends GetView<UserHistoryController> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Container(
       width: double.infinity,
       color: AppColors.primaryGreen,
@@ -117,22 +115,11 @@ class UserHistoryView extends GetView<UserHistoryController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Riwayat Prediksi',
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
+          Text('Riwayat Prediksi', style: AppTextStyles.appTitle(context)),
           const SizedBox(height: 4),
           Text(
             'Lihat hasil prediksi sebelumnya\ndan pantau performa Anda.',
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: Colors.white.withValues(alpha: 0.85),
-              height: 1.5,
-            ),
+            style: AppTextStyles.appSubtitle(context),
           ),
         ],
       ),

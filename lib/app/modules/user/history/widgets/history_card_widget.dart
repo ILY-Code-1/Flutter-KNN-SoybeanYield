@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../constants/app_colors.dart';
+import '../../../../constants/app_text_styles.dart';
 import '../models/user_prediction_model.dart';
 
 class HistoryCardWidget extends StatelessWidget {
@@ -31,11 +31,7 @@ class HistoryCardWidget extends StatelessWidget {
                 children: [
                   Text(
                     DateFormat('dd/MM/yyyy').format(prediction.date),
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
+                    style: AppTextStyles.cardLabel(context),
                   ),
                   const SizedBox(height: 6),
                   // Teal result pill
@@ -50,11 +46,7 @@ class HistoryCardWidget extends StatelessWidget {
                     ),
                     child: Text(
                       '${prediction.result} ton',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                      style: AppTextStyles.badgeText(context),
                     ),
                   ),
                 ],

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../constants/app_colors.dart';
+import '../../../../constants/app_text_styles.dart';
 import '../../../../core/auth/auth_controller.dart';
 import '../../../../data/dummy/prediction_dummy.dart';
 import '../../../../global_widgets/confirm_dialog.dart';
@@ -16,6 +16,9 @@ class PredictionHistoryController extends GetxController {
   final RxList<PredictionModel> filteredPredictions = <PredictionModel>[].obs;
   final RxString selectedFilter = 'Semua'.obs;
   final Rxn<PredictionModel> selectedPrediction = Rxn<PredictionModel>();
+
+  /// Controller untuk input hasil panen aktual di halaman detail prediksi.
+  final hasilPanenAktualController = TextEditingController();
 
   static const Map<String, int> _monthMap = {
     'Januari': 1,
@@ -59,73 +62,70 @@ class PredictionHistoryController extends GetxController {
 
   void showFilterSheet() {
     Get.bottomSheet(
-      Container(
-        decoration: const BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle bar
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.divider,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Filter Waktu Prediksi',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 12),
-            ...PredictionDummy.filterOptions.map(
-              (option) => Obx(
-                () => ListTile(
-                  dense: true,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 8),
-                  title: Text(
-                    option,
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: selectedFilter.value == option
-                          ? FontWeight.w600
-                          : FontWeight.w400,
-                      color: selectedFilter.value == option
-                          ? AppColors.primaryGreen
-                          : AppColors.textPrimary,
-                    ),
-                  ),
-                  trailing: selectedFilter.value == option
-                      ? const Icon(
-                          Icons.check_circle,
-                          color: AppColors.primaryGreen,
-                          size: 20,
-                        )
-                      : const Icon(
-                          Icons.circle_outlined,
-                          color: AppColors.textSecondary,
-                          size: 20,
-                        ),
-                  onTap: () {
-                    filterByMonth(option);
-                    Get.back();
-                  },
+      Builder(builder: (context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.divider,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
+              const SizedBox(height: 16),
+              Text(
+                'Filter Waktu Prediksi',
+                style: AppTextStyles.sectionTitle(context),
+              ),
+              const SizedBox(height: 12),
+              ...PredictionDummy.filterOptions.map(
+                (option) => Obx(
+                  () => ListTile(
+                    dense: true,
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 8),
+                    title: Text(
+                      option,
+                      style: AppTextStyles.cardLabel(context).copyWith(
+                        fontWeight: selectedFilter.value == option
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                        color: selectedFilter.value == option
+                            ? AppColors.primaryGreen
+                            : AppColors.textPrimary,
+                      ),
+                    ),
+                    trailing: selectedFilter.value == option
+                        ? const Icon(
+                            Icons.check_circle,
+                            color: AppColors.primaryGreen,
+                            size: 20,
+                          )
+                        : const Icon(
+                            Icons.circle_outlined,
+                            color: AppColors.textSecondary,
+                            size: 20,
+                          ),
+                    onTap: () {
+                      filterByMonth(option);
+                      Get.back();
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
     );
@@ -133,7 +133,31 @@ class PredictionHistoryController extends GetxController {
 
   void selectPrediction(PredictionModel prediction) {
     selectedPrediction.value = prediction;
+    hasilPanenAktualController.clear();
     Get.toNamed(AppRoutes.adminPredictionDetail);
+  }
+
+  void saveHasilPanenAktual() {
+    final nilai = hasilPanenAktualController.text.trim();
+    if (nilai.isEmpty || double.tryParse(nilai) == null) {
+      Get.snackbar(
+        'Data Tidak Valid',
+        'Masukkan angka yang valid untuk hasil panen aktual',
+        backgroundColor: Colors.red.shade400,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(16),
+      );
+      return;
+    }
+    Get.snackbar(
+      'Berhasil',
+      'Hasil panen aktual $nilai ton/ha telah disimpan',
+      backgroundColor: AppColors.primaryGreen,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.all(16),
+    );
   }
 
   void downloadResult() {
@@ -156,5 +180,11 @@ class PredictionHistoryController extends GetxController {
       isDanger: true,
       onConfirm: () => _auth.logoutWithLoading(),
     );
+  }
+
+  @override
+  void onClose() {
+    hasilPanenAktualController.dispose();
+    super.onClose();
   }
 }

@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../constants/app_colors.dart';
-import '../../../../global_widgets/user_bottom_nav.dart';
-import '../../../../routes/app_routes.dart';
+import '../../../../constants/app_text_styles.dart';
+import '../../../../global_widgets/fullscreen_app_bar.dart';
 import '../../history/models/user_prediction_model.dart';
 import '../widgets/detail_row_widget.dart';
 
-/// Stateless detail screen — all data arrives via [Get.arguments] as a
+/// Detail screen — all data arrives via [Get.arguments] as a
 /// [UserPredictionModel]. Works for both fresh predictions and history taps.
-class PredictionDetailUserView extends StatelessWidget {
+class PredictionDetailUserView extends StatefulWidget {
   const PredictionDetailUserView({super.key});
+
+  @override
+  State<PredictionDetailUserView> createState() =>
+      _PredictionDetailUserViewState();
+}
+
+class _PredictionDetailUserViewState extends State<PredictionDetailUserView> {
+  final TextEditingController _hasilPanenAktualController =
+      TextEditingController();
+
+  @override
+  void dispose() {
+    _hasilPanenAktualController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +35,7 @@ class PredictionDetailUserView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
+      appBar: const FullscreenAppBar(),
       body: Column(
         children: [
           // ── Green header ───────────────────────────────────────────────────
@@ -34,19 +48,12 @@ class PredictionDetailUserView extends StatelessWidget {
               children: [
                 Text(
                   'Predictions Detail',
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.white,
-                  ),
+                  style: AppTextStyles.appTitle(context),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Unduh dan bagikan hasil prediksi',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.white.withValues(alpha: 0.85),
-                  ),
+                  'Detail hasil prediksi dan input data lahan',
+                  style: AppTextStyles.appSubtitle(context),
                 ),
               ],
             ),
@@ -62,11 +69,8 @@ class PredictionDetailUserView extends StatelessWidget {
                   // Section: Estimasi Hasil Panen
                   Text(
                     'Estimasi Hasil Panen',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryGreen,
-                    ),
+                    style: AppTextStyles.sectionTitle(context)
+                        .copyWith(color: AppColors.primaryGreen),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 12),
@@ -102,11 +106,7 @@ class PredictionDetailUserView extends StatelessWidget {
                         const SizedBox(width: 16),
                         Text(
                           '${model.result} ton/ha',
-                          style: GoogleFonts.poppins(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                          style: AppTextStyles.resultValue(context),
                         ),
                       ],
                     ),
@@ -118,11 +118,7 @@ class PredictionDetailUserView extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Detail Input',
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTextStyles.sectionTitle(context),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -133,6 +129,8 @@ class PredictionDetailUserView extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppColors.inputBackground,
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: Colors.black.withValues(alpha: 0.5), width: 1),
                     ),
                     child: Column(
                       children: [
@@ -145,23 +143,24 @@ class PredictionDetailUserView extends StatelessWidget {
                           value: '${model.curahHujan.toStringAsFixed(0)} mm',
                         ),
                         DetailRowWidget(
+                          label: 'Kelembaban',
+                          value: '${model.kelembaban.toStringAsFixed(0)}%',
+                        ),
+                        DetailRowWidget(
                           label: 'pH Tanah',
                           value: model.phTanah.toStringAsFixed(1),
                         ),
                         DetailRowWidget(
                           label: 'Nitrogen',
-                          value:
-                              '${model.nitrogen.toStringAsFixed(0)} mg/kg',
+                          value: '${model.nitrogen.toStringAsFixed(0)} mg/kg',
                         ),
                         DetailRowWidget(
                           label: 'Fosfor',
-                          value:
-                              '${model.fosfor.toStringAsFixed(0)} mg/kg',
+                          value: '${model.fosfor.toStringAsFixed(0)} mg/kg',
                         ),
                         DetailRowWidget(
                           label: 'Kalium',
-                          value:
-                              '${model.kalium.toStringAsFixed(0)} mg/kg',
+                          value: '${model.kalium.toStringAsFixed(0)} mg/kg',
                         ),
                       ],
                     ),
@@ -173,11 +172,7 @@ class PredictionDetailUserView extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Tanggal Prediksi',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTextStyles.sectionTitle(context),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -199,10 +194,54 @@ class PredictionDetailUserView extends StatelessWidget {
                         const SizedBox(width: 10),
                         Text(
                           DateFormat('dd/MM/yyyy').format(model.date),
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                          style: AppTextStyles.chipText(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Section: Data Hasil Panen Aktual
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Data Hasil Panen Aktual',
+                      style: AppTextStyles.sectionTitle(context),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Aktual harvest input — same color as tanggal prediksi
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.accentTeal,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Iconsax.chart_21,
+                            color: Colors.white, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: TextField(
+                            controller: _hasilPanenAktualController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            style: AppTextStyles.chipText(context),
+                            decoration: InputDecoration(
+                              hintText: 'e.g. 2.5',
+                              hintStyle: AppTextStyles.chipText(context)
+                                  .copyWith(color: Colors.white60),
+                              suffixText: 'ton/ha',
+                              suffixStyle: AppTextStyles.inputLabel(context)
+                                  .copyWith(color: Colors.white),
+                              border: InputBorder.none,
+                            ),
                           ),
                         ),
                       ],
@@ -210,34 +249,49 @@ class PredictionDetailUserView extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
 
-                  // Download button
+                  // Simpan Hasil Panen Aktual button
                   SizedBox(
                     height: 52,
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        Get.snackbar(
-                          'Info',
-                          'Fitur unduh segera hadir',
-                          backgroundColor: AppColors.primaryGreen,
-                          colorText: Colors.white,
-                          snackPosition: SnackPosition.TOP,
-                          margin: const EdgeInsets.all(16),
-                        );
-                      },
+                      onPressed: _hasilPanenAktualController.text.isEmpty
+                          ? null
+                          : () {
+                              final nilai =
+                                  _hasilPanenAktualController.text.trim();
+                              if (nilai.isEmpty ||
+                                  double.tryParse(nilai) == null) {
+                                Get.snackbar(
+                                  'Data Tidak Valid',
+                                  'Masukkan angka yang valid untuk hasil panen aktual',
+                                  backgroundColor: Colors.red.shade400,
+                                  colorText: Colors.white,
+                                  snackPosition: SnackPosition.TOP,
+                                  margin: const EdgeInsets.all(16),
+                                );
+                                return;
+                              }
+                              Get.snackbar(
+                                'Berhasil',
+                                'Hasil panen aktual $nilai ton/ha telah disimpan',
+                                backgroundColor: AppColors.primaryGreen,
+                                colorText: Colors.white,
+                                snackPosition: SnackPosition.TOP,
+                                margin: const EdgeInsets.all(16),
+                              );
+                            },
                       icon: const Icon(
-                        Icons.file_download_outlined,
+                        Icons.save_outlined,
                         color: Colors.white,
                       ),
                       label: Text(
-                        'Unduh Hasil Prediksi',
-                        style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                        'Simpan Hasil Panen Aktual',
+                        style: AppTextStyles.buttonText(context),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryGreen,
+                        backgroundColor:
+                            _hasilPanenAktualController.text.isEmpty
+                                ? Colors.grey
+                                : AppColors.primaryGreen,
                         elevation: 2,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -252,37 +306,7 @@ class PredictionDetailUserView extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.toNamed(AppRoutes.userInputPrediksi),
-        backgroundColor: AppColors.primaryGreen,
-        elevation: 4,
-        child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: const UserBottomNav(currentIndex: 1),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.primaryGreen,
-      elevation: 0,
-      automaticallyImplyLeading: false,
-      leadingWidth: 110,
-      leading: TextButton.icon(
-        onPressed: () => Get.back(),
-        icon: const Icon(
-          Icons.arrow_back_ios_rounded,
-          color: Colors.white,
-          size: 16,
-        ),
-        label: Text(
-          'Kembali',
-          style: GoogleFonts.poppins(color: Colors.white, fontSize: 13),
-        ),
-        style: TextButton.styleFrom(padding: EdgeInsets.zero),
-      ),
-      actions: const [SizedBox(width: 8)],
-    );
-  }
 }

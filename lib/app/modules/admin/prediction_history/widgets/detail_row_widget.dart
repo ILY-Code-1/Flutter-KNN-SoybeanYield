@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../constants/app_colors.dart';
+import '../../../../constants/app_text_styles.dart';
 
 class DetailRowWidget extends StatelessWidget {
   final String label;
@@ -19,27 +19,12 @@ class DetailRowWidget extends StatelessWidget {
       children: [
         SizedBox(
           width: 120,
-          child: Text(
-            label,
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
-            ),
-          ),
+          child: Text(label, style: AppTextStyles.detailLabel(context)),
         ),
-        Text(
-          ': ',
-          style: GoogleFonts.poppins(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
-          ),
-        ),
+        Text(': ', style: AppTextStyles.detailLabel(context)),
         Text(
           value,
-          style: GoogleFonts.poppins(
-            fontSize: 13,
+          style: AppTextStyles.detailLabel(context).copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.primaryGreen,
           ),

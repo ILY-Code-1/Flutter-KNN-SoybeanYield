@@ -5,6 +5,7 @@ class PredictionModel {
   final double result;
   final double suhu;
   final double curahHujan;
+  final double kelembaban;
   final double phTanah;
   final double nitrogen;
   final double fosfor;
@@ -17,6 +18,7 @@ class PredictionModel {
     required this.result,
     required this.suhu,
     required this.curahHujan,
+    required this.kelembaban,
     required this.phTanah,
     required this.nitrogen,
     required this.fosfor,

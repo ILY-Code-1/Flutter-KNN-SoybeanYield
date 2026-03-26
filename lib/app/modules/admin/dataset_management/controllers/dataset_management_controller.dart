@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -14,6 +15,7 @@ class DatasetManagementController extends GetxController {
   final RxList<DatasetModel> datasets = <DatasetModel>[].obs;
   final RxBool isLoading = false.obs;
   final Rx<String?> selectedFileName = Rx<String?>(null);
+  final Rx<String?> selectedFilePath = Rx<String?>(null);
 
   // ── Manual input form controllers ──
   final suhuController = TextEditingController();
@@ -42,6 +44,28 @@ class DatasetManagementController extends GetxController {
       colorText: Colors.white,
       snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.all(16),
+    );
+  }
+
+  void deleteDataset(String id) {
+    datasets.removeWhere((d) => d.id == id);
+    Get.snackbar(
+      'Berhasil',
+      'Dataset berhasil dihapus',
+      backgroundColor: AppColors.primaryGreen,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.all(16),
+    );
+  }
+
+  void confirmDelete(String id) {
+    ConfirmDialog.show(
+      title: 'Hapus Dataset',
+      message: 'Data ini akan dihapus secara permanen. Lanjutkan?',
+      confirmText: 'Hapus',
+      isDanger: true,
+      onConfirm: () => deleteDataset(id),
     );
   }
 
@@ -111,18 +135,40 @@ class DatasetManagementController extends GetxController {
     hasilPanenController.clear();
   }
 
-  // ── Upload file ──────────────────────────────────────────────────────────────
+  // ── Upload file (file_picker) ─────────────────────────────────────────────
 
-  void simulateUpload() {
-    selectedFileName.value = 'dataset.txt';
-    Get.snackbar(
-      'File Dipilih',
-      'dataset.txt siap untuk diupload',
-      backgroundColor: AppColors.primaryGreen,
-      colorText: Colors.white,
-      snackPosition: SnackPosition.TOP,
-      margin: const EdgeInsets.all(16),
-    );
+  /// Membuka file manager untuk memilih file dataset (.txt / .csv).
+  /// Izin akses penyimpanan akan diminta otomatis oleh sistem OS.
+  Future<void> pickFile() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['txt', 'csv'],
+        dialogTitle: 'Pilih file dataset',
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        selectedFileName.value = result.files.single.name;
+        selectedFilePath.value = result.files.single.path;
+        Get.snackbar(
+          'File Dipilih',
+          '${result.files.single.name} siap untuk diupload',
+          backgroundColor: AppColors.primaryGreen,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
+          margin: const EdgeInsets.all(16),
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Gagal Membuka File',
+        'Tidak dapat membuka file manager. Periksa izin aplikasi.',
+        backgroundColor: Colors.red.shade400,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(16),
+      );
+    }
   }
 
   void saveUploadedFile() {
@@ -153,6 +199,7 @@ class DatasetManagementController extends GetxController {
           margin: const EdgeInsets.all(16),
         );
         selectedFileName.value = null;
+        selectedFilePath.value = null;
         Get.back();
       },
     );

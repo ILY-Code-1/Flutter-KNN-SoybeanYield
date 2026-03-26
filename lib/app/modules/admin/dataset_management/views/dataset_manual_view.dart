@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:iconsax/iconsax.dart';
-
 import '../../../../constants/app_colors.dart';
-import '../../../../global_widgets/admin_bottom_nav.dart';
+import '../../../../constants/app_text_styles.dart';
+import '../../../../global_widgets/fullscreen_app_bar.dart';
 import '../controllers/dataset_management_controller.dart';
 import '../widgets/dataset_form_field_widget.dart';
 
@@ -15,12 +13,12 @@ class DatasetManualView extends GetView<DatasetManagementController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
+      appBar: const FullscreenAppBar(),
       body: SingleChildScrollView(
         child: Column(
           children: [
             // ── Green header ─────────────────────────────────────────────────
-            _buildHeader(),
+            _buildHeader(context),
 
             // ── Content section ───────────────────────────────────────────────
             Transform.translate(
@@ -120,12 +118,8 @@ class DatasetManualView extends GetView<DatasetManagementController> {
                           ),
                           child: Text(
                             'SIMPAN DATASET',
-                            style: GoogleFonts.poppins(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF212121),
-                              letterSpacing: 1.0,
-                            ),
+                            style: AppTextStyles.buttonText(context)
+                                .copyWith(color: const Color(0xFF212121)),
                           ),
                         ),
                       ),
@@ -137,29 +131,10 @@ class DatasetManualView extends GetView<DatasetManagementController> {
           ],
         ),
       ),
-      bottomNavigationBar: const AdminBottomNav(currentIndex: 2),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.primaryGreen,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Iconsax.arrow_left, color: Colors.white),
-        onPressed: () => Get.back(),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Iconsax.logout, color: Colors.white),
-          onPressed: controller.logout,
-          tooltip: 'Logout',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Container(
       width: double.infinity,
       color: AppColors.primaryGreen,
@@ -167,22 +142,11 @@ class DatasetManualView extends GetView<DatasetManagementController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Input Dataset',
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
+          Text('Input Dataset', style: AppTextStyles.appTitle(context)),
           const SizedBox(height: 4),
           Text(
             'Masukan data untuk menambah akurasi\nprediksi hasil panen.',
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: Colors.white.withValues(alpha: 0.85),
-              height: 1.5,
-            ),
+            style: AppTextStyles.appSubtitle(context),
           ),
         ],
       ),

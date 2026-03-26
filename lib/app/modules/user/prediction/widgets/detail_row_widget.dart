@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../constants/app_colors.dart';
+import '../../../../constants/app_text_styles.dart';
 
 class DetailRowWidget extends StatelessWidget {
   final String label;
@@ -21,24 +20,11 @@ class DetailRowWidget extends StatelessWidget {
         children: [
           Expanded(
             flex: 4,
-            child: Text(
-              label,
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
-              ),
-            ),
+            child: Text(label, style: AppTextStyles.detailLabel(context)),
           ),
           Expanded(
             flex: 5,
-            child: Text(
-              ': $value',
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: AppColors.textPrimary,
-              ),
-            ),
+            child: Text(': $value', style: AppTextStyles.detailValue(context)),
           ),
         ],
       ),

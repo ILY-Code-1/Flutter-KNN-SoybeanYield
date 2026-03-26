@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../constants/app_colors.dart';
+import '../../../../constants/app_text_styles.dart';
 
 class InfoCardWidget extends StatelessWidget {
   final String title;
@@ -40,29 +40,17 @@ class InfoCardWidget extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: accentColor,
-            ),
+            style: AppTextStyles.cardLabel(context)
+                .copyWith(fontWeight: FontWeight.bold, color: accentColor),
           ),
           const SizedBox(height: 2),
           Text(
             subtitle,
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: accentColor.withValues(alpha: 0.8),
-            ),
+            style: AppTextStyles.inputLabel(context)
+                .copyWith(color: accentColor.withValues(alpha: 0.8)),
           ),
           const SizedBox(height: 8),
-          Text(
-            body,
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              color: AppColors.textSecondary,
-              height: 1.5,
-            ),
-          ),
+          Text(body, style: AppTextStyles.bodyText(context)),
         ],
       ),
     );

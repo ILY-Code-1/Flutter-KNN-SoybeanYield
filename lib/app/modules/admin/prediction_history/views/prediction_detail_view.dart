@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../constants/app_colors.dart';
-import '../../../../global_widgets/admin_bottom_nav.dart';
+import '../../../../constants/app_text_styles.dart';
+import '../../../../global_widgets/fullscreen_app_bar.dart';
 import '../../../../global_widgets/primary_button.dart';
 import '../controllers/prediction_history_controller.dart';
 import '../widgets/detail_row_widget.dart';
@@ -17,7 +17,7 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
+      appBar: const FullscreenAppBar(),
       body: Obx(() {
         final prediction = controller.selectedPrediction.value;
         if (prediction == null) {
@@ -27,7 +27,7 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
           child: Column(
             children: [
               // ── Green header ───────────────────────────────────────────────
-              _buildHeader(),
+              _buildHeader(context),
 
               // ── Content section ────────────────────────────────────────────
               Transform.translate(
@@ -48,60 +48,57 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
                       Center(
                         child: Text(
                           'Estimasi Hasil Panen',
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryGreen,
-                          ),
+                          style: AppTextStyles.sectionTitle(context)
+                              .copyWith(color: AppColors.primaryGreen),
                         ),
                       ),
                       const SizedBox(height: 12),
-                      _buildResultCard(prediction.result),
+                      _buildResultCard(context, prediction.result),
                       const SizedBox(height: 24),
 
                       // ── Detail Input ───────────────────────────────────────
                       Text(
                         'Detail Input',
-                        style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
+                        style: AppTextStyles.sectionTitle(context),
                       ),
                       const SizedBox(height: 10),
-                      _buildInputDetailCard(prediction),
+                      _buildInputDetailCard(context, prediction),
                       const SizedBox(height: 24),
 
                       // ── Tanggal Prediksi ───────────────────────────────────
                       Text(
                         'Tanggal Prediksi',
-                        style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
+                        style: AppTextStyles.sectionTitle(context),
                       ),
                       const SizedBox(height: 10),
                       _buildInfoChip(
+                        context: context,
                         icon: Iconsax.calendar,
-                        text: DateFormat('dd/MM/yyyy').format(prediction.date),
+                        text: DateFormat('dd/MM/yyyy')
+                            .format(prediction.date),
                       ),
                       const SizedBox(height: 20),
 
                       // ── Pembuat Prediksi ───────────────────────────────────
                       Text(
                         'Pembuat Prediksi',
-                        style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
+                        style: AppTextStyles.sectionTitle(context),
                       ),
                       const SizedBox(height: 10),
                       _buildInfoChip(
+                        context: context,
                         icon: Iconsax.user,
                         text: prediction.username,
                       ),
+                      const SizedBox(height: 20),
+
+                      // ── Data Hasil Panen Aktual ────────────────────────────
+                      Text(
+                        'Data Hasil Panen Aktual',
+                        style: AppTextStyles.sectionTitle(context),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildHasilPanenAktualField(context),
                       const SizedBox(height: 28),
 
                       // ── Download button ────────────────────────────────────
@@ -118,29 +115,10 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
           ),
         );
       }),
-      bottomNavigationBar: const AdminBottomNav(currentIndex: 3),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    return AppBar(
-      backgroundColor: AppColors.primaryGreen,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Iconsax.arrow_left, color: Colors.white),
-        onPressed: () => Get.back(),
-      ),
-      actions: [
-        IconButton(
-          icon: const Icon(Iconsax.logout, color: Colors.white),
-          onPressed: controller.logout,
-          tooltip: 'Logout',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Container(
       width: double.infinity,
       color: AppColors.primaryGreen,
@@ -148,28 +126,18 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Detail Prediksi',
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
+          Text('Detail Prediksi', style: AppTextStyles.appTitle(context)),
           const SizedBox(height: 4),
           Text(
-            'Unduh dan bagikan hasil prediksi.',
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: Colors.white.withValues(alpha: 0.85),
-            ),
+            'Detail hasil prediksi dan input data lahan.',
+            style: AppTextStyles.appSubtitle(context),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildResultCard(double result) {
+  Widget _buildResultCard(BuildContext context, double result) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
@@ -208,18 +176,11 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
             children: [
               Text(
                 '${result.toStringAsFixed(2)} ton/ha',
-                style: GoogleFonts.poppins(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.white,
-                ),
+                style: AppTextStyles.resultValue(context),
               ),
               Text(
                 'Estimasi hasil panen kedelai',
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  color: Colors.white.withValues(alpha: 0.85),
-                ),
+                style: AppTextStyles.appSubtitle(context),
               ),
             ],
           ),
@@ -228,7 +189,7 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
     );
   }
 
-  Widget _buildInputDetailCard(dynamic prediction) {
+  Widget _buildInputDetailCard(BuildContext context, dynamic prediction) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -245,6 +206,10 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
           DetailRowWidget(
               label: 'Curah Hujan',
               value: '${prediction.curahHujan.toStringAsFixed(0)} mm'),
+          const SizedBox(height: 10),
+          DetailRowWidget(
+              label: 'Kelembaban',
+              value: '${prediction.kelembaban.toStringAsFixed(0)}%'),
           const SizedBox(height: 10),
           DetailRowWidget(
               label: 'pH Tanah',
@@ -266,7 +231,11 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
     );
   }
 
-  Widget _buildInfoChip({required IconData icon, required String text}) {
+  Widget _buildInfoChip({
+    required BuildContext context,
+    required IconData icon,
+    required String text,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -278,13 +247,47 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
         children: [
           Icon(icon, color: AppColors.white, size: 20),
           const SizedBox(width: 12),
-          Text(
-            text,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: AppColors.white,
+          Text(text, style: AppTextStyles.chipText(context)),
+        ],
+      ),
+    );
+  }
+
+  /// Field input hasil panen aktual — sama dengan style chip tanggal (accentTeal).
+  Widget _buildHasilPanenAktualField(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.accentTeal,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          const Icon(Iconsax.chart_21, color: Colors.white, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              controller: controller.hasilPanenAktualController,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              style: AppTextStyles.chipText(context),
+              onChanged: (_) {},
+              decoration: InputDecoration(
+                hintText: 'e.g. 2.5',
+                hintStyle: AppTextStyles.chipText(context)
+                    .copyWith(color: Colors.white60),
+                suffixText: 'ton/ha',
+                suffixStyle: AppTextStyles.inputLabel(context)
+                    .copyWith(color: Colors.white),
+                border: InputBorder.none,
+              ),
             ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.save_outlined,
+                color: Colors.white, size: 20),
+            tooltip: 'Simpan',
+            onPressed: controller.saveHasilPanenAktual,
           ),
         ],
       ),

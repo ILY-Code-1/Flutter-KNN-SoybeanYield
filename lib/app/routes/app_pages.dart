@@ -52,6 +52,7 @@ class AppPages {
       page: () => const UserDetailView(),
       binding: UserManagementBinding(),
       middlewares: [AuthMiddleware()],
+      fullscreenDialog: true,
     ),
     GetPage(
       name: AppRoutes.adminDatasetManagement,
@@ -64,12 +65,14 @@ class AppPages {
       page: () => const DatasetManualView(),
       binding: DatasetManagementBinding(),
       middlewares: [AuthMiddleware()],
+      fullscreenDialog: true,
     ),
     GetPage(
       name: AppRoutes.adminDatasetUpload,
       page: () => const DatasetUploadView(),
       binding: DatasetManagementBinding(),
       middlewares: [AuthMiddleware()],
+      fullscreenDialog: true,
     ),
     GetPage(
       name: AppRoutes.adminPredictionHistory,
@@ -82,6 +85,7 @@ class AppPages {
       page: () => const PredictionDetailView(),
       binding: PredictionHistoryBinding(),
       middlewares: [AuthMiddleware()],
+      fullscreenDialog: true,
     ),
 
     // ── User (Petani) ─────────────────────────────────────────────────────────
@@ -96,12 +100,14 @@ class AppPages {
       page: () => const InputPrediksiView(),
       binding: PredictionBinding(),
       middlewares: [AuthMiddleware()],
+      fullscreenDialog: true,
     ),
     GetPage(
       name: AppRoutes.userPredictionDetail,
       page: () => const PredictionDetailUserView(),
       // No binding — data passed entirely via Get.arguments
       middlewares: [AuthMiddleware()],
+      fullscreenDialog: true,
     ),
     GetPage(
       name: AppRoutes.userHistory,
