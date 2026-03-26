@@ -1,10 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/auth/auth_controller.dart';
 import '../../../routes/app_routes.dart';
-import '../../../services/firebase_auth_service.dart';
 import '../../../services/firestore_user_service.dart';
 
 class SignInController extends GetxController {
@@ -14,12 +12,10 @@ class SignInController extends GetxController {
   final isLoading = false.obs;
 
   final _auth = Get.find<AuthController>();
-  final _authService = FirebaseAuthService();
   final _userService = FirestoreUserService();
 
-  void togglePasswordVisibility() {
-    isPasswordVisible.value = !isPasswordVisible.value;
-  }
+  void togglePasswordVisibility() =>
+      isPasswordVisible.value = !isPasswordVisible.value;
 
   Future<void> signIn() async {
     final username = usernameController.text.trim();
@@ -32,28 +28,27 @@ class SignInController extends GetxController {
 
     isLoading.value = true;
     try {
-      final credential = await _authService.signIn(username, password);
-      final uid = credential?.user?.uid;
-      if (uid == null) throw Exception('Login gagal, coba lagi');
+      final user = await _userService.login(username, password);
 
-      final role = await _userService.getUserRole(uid);
-      if (role == null) {
-        // Firestore doc missing — sign out and surface the error
-        await _authService.signOut();
-        throw Exception('Data pengguna tidak ditemukan di sistem');
+      if (user == null) {
+        _showError('Username atau password salah');
+        return;
       }
 
-      _auth.login(userId: uid, username: username, role: role);
+      _auth.login(
+        userId: user.id,
+        username: user.username,
+        role: user.role,
+        password: user.password,
+      );
 
-      if (role.toLowerCase() == 'admin') {
+      if (user.isAdmin) {
         Get.offAllNamed(AppRoutes.adminDashboard);
       } else {
         Get.offAllNamed(AppRoutes.userDashboard);
       }
-    } on FirebaseAuthException catch (e) {
-      _showError(e.message ?? 'Terjadi kesalahan, silakan coba lagi');
-    } catch (e) {
-      _showError(e.toString().replaceAll('Exception: ', ''));
+    } catch (_) {
+      _showError('Terjadi kesalahan, silakan coba lagi');
     } finally {
       isLoading.value = false;
     }

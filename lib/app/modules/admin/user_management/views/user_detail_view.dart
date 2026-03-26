@@ -16,7 +16,9 @@ class UserDetailView extends GetView<UserManagementController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: const FullscreenAppBar(),
-      body: SingleChildScrollView(
+      body: Stack(
+        children: [
+          SingleChildScrollView(
         child: Column(
           children: [
             // ── Green header ─────────────────────────────────────────────────
@@ -182,7 +184,22 @@ class UserDetailView extends GetView<UserManagementController> {
           ],
         ),
       ),
-    );
+      // ── Loading overlay ─────────────────────────────────────────────────
+      Obx(
+        () => controller.isSaving.value
+            ? Container(
+                color: Colors.black.withValues(alpha: 0.4),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primaryGreen,
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(),
+      ),
+    ],
+  ),
+);
   }
 
   // ── Green header ────────────────────────────────────────────────────────────

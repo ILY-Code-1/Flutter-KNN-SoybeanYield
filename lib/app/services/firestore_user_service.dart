@@ -2,14 +2,39 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../modules/admin/user_management/models/user_model.dart';
 
-/// Manages CRUD operations for the `users-soybean` Firestore collection.
 class FirestoreUserService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   static const String _collection = 'users-soybean';
 
+  // ── Auth ──────────────────────────────────────────────────────────────────
+
+  /// Cek username + password langsung ke Firestore (plain text).
+  /// Return [UserModel] jika cocok, null jika salah.
+  Future<UserModel?> login(String username, String password) async {
+    try {
+      final snapshot = await _db
+          .collection(_collection)
+          .where('username', isEqualTo: username)
+          .where('password', isEqualTo: password)
+          .limit(1)
+          .get();
+
+      if (snapshot.docs.isEmpty) return null;
+
+      final doc = snapshot.docs.first;
+      final data = doc.data();
+      final stored = data['password'] as String? ?? '';
+
+      if (stored != password) return null;
+
+      return UserModel.fromFirestore(doc);
+    } catch (_) {
+      return null;
+    }
+  }
+
   // ── Read ──────────────────────────────────────────────────────────────────
 
-  /// Returns all user documents ordered by creation date (newest first).
   Future<List<UserModel>> getUsers() async {
     try {
       final snapshot = await _db
@@ -22,7 +47,6 @@ class FirestoreUserService {
     }
   }
 
-  /// Returns a single user by [uid], or null if not found.
   Future<UserModel?> getUserById(String uid) async {
     try {
       final doc = await _db.collection(_collection).doc(uid).get();
@@ -33,51 +57,52 @@ class FirestoreUserService {
     }
   }
 
-  /// Returns only the role string for [uid], or null on failure.
-  Future<String?> getUserRole(String uid) async {
+  /// Cek apakah username sudah dipakai user lain.
+  Future<bool> isUsernameExists(String username, {String? excludeUid}) async {
     try {
-      final doc = await _db.collection(_collection).doc(uid).get();
-      if (!doc.exists) return null;
-      final data = doc.data();
-      return data?['role'] as String?;
-    } catch (_) {
-      return null;
-    }
-  }
+      final snapshot = await _db
+          .collection(_collection)
+          .where('username', isEqualTo: username)
+          .limit(2)
+          .get();
 
-  // ── Create ────────────────────────────────────────────────────────────────
-
-  /// Creates the Firestore document for a newly registered user.
-  /// The document ID is the Firebase Auth [uid].
-  Future<bool> createUserDoc(
-    String uid,
-    String username,
-    String role,
-  ) async {
-    try {
-      final email = '${username.toLowerCase()}@soybeanyield.com';
-      final user = UserModel(
-        id: uid,
-        username: username,
-        email: email,
-        role: role,
-        createdAt: DateTime.now(),
-      );
-      await _db.collection(_collection).doc(uid).set(user.toFirestore());
-      return true;
+      if (snapshot.docs.isEmpty) return false;
+      if (excludeUid == null) return true;
+      return snapshot.docs.any((d) => d.id != excludeUid);
     } catch (_) {
       return false;
     }
   }
 
+  // ── Create ────────────────────────────────────────────────────────────────
+
+  /// Buat user baru di Firestore. Password disimpan plain text.
+  Future<String?> createUser(
+    String username,
+    String password,
+    String role,
+  ) async {
+    try {
+      final docRef = _db.collection(_collection).doc();
+      final user = UserModel(
+        id: docRef.id,
+        username: username,
+        role: role,
+        createdAt: DateTime.now(),
+        password: password,
+      );
+      await docRef.set({
+        ...user.toFirestore(),
+        'password': password,
+      });
+      return docRef.id;
+    } catch (_) {
+      return null;
+    }
+  }
+
   // ── Update ────────────────────────────────────────────────────────────────
 
-  /// Updates [username] and [role] for the document identified by [uid].
-  ///
-  /// NOTE: The corresponding Firebase Auth email is NOT updated here because
-  /// changing another account's email requires the Firebase Admin SDK
-  /// (server-side). The internal email field in Firestore is updated to stay
-  /// consistent, but the Auth credentials remain tied to the original email.
   Future<bool> updateUser(
     String uid,
     String newUsername,
@@ -86,7 +111,6 @@ class FirestoreUserService {
     try {
       await _db.collection(_collection).doc(uid).update({
         'username': newUsername,
-        'email': '${newUsername.toLowerCase()}@soybeanyield.com',
         'role': role,
       });
       return true;
@@ -97,11 +121,6 @@ class FirestoreUserService {
 
   // ── Delete ────────────────────────────────────────────────────────────────
 
-  /// Deletes the Firestore document for [uid].
-  ///
-  /// NOTE: The Firebase Auth account is NOT deleted (requires Admin SDK).
-  /// The orphaned Auth account can be removed via the Firebase Console or a
-  /// Cloud Function trigger.
   Future<bool> deleteUserDoc(String uid) async {
     try {
       await _db.collection(_collection).doc(uid).delete();

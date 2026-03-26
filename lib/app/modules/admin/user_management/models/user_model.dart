@@ -3,16 +3,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class UserModel {
   final String id;
   final String username;
-  final String email;
+  final String password;
   final String role;
   final DateTime createdAt;
 
   const UserModel({
     required this.id,
     required this.username,
-    required this.email,
     required this.role,
     required this.createdAt,
+    required this.password,
   });
 
   // ── Firestore serialisation ───────────────────────────────────────────────
@@ -22,23 +22,20 @@ class UserModel {
     return UserModel(
       id: doc.id,
       username: data['username'] as String? ?? '',
-      email: data['email'] as String? ?? '',
       role: data['role'] as String? ?? 'user',
-      createdAt:
-          (data['created_at'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt: (data['created_at'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      password: data['password'] as String? ?? '',
     );
   }
 
   Map<String, dynamic> toFirestore() => {
         'username': username,
-        'email': email,
         'role': role,
         'created_at': Timestamp.fromDate(createdAt),
       };
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
-  /// Display-friendly role: 'admin' → 'Admin', 'user' → 'User'.
   String get roleDisplay =>
       role.isEmpty ? role : role[0].toUpperCase() + role.substring(1);
 
@@ -47,16 +44,16 @@ class UserModel {
   UserModel copyWith({
     String? id,
     String? username,
-    String? email,
     String? role,
     DateTime? createdAt,
+    String? password,
   }) {
     return UserModel(
       id: id ?? this.id,
       username: username ?? this.username,
-      email: email ?? this.email,
       role: role ?? this.role,
       createdAt: createdAt ?? this.createdAt,
+      password: password ?? this.password,
     );
   }
 }

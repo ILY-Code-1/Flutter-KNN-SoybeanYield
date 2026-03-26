@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -6,14 +5,12 @@ import '../../../../constants/app_colors.dart';
 import '../../../../core/auth/auth_controller.dart';
 import '../../../../global_widgets/confirm_dialog.dart';
 import '../../../../routes/app_routes.dart';
-import '../../../../services/firebase_auth_service.dart';
 import '../../../../services/firestore_user_service.dart';
 import '../models/user_model.dart';
 
 class UserManagementController extends GetxController {
   final _auth = Get.find<AuthController>();
   final _userService = FirestoreUserService();
-  final _authService = FirebaseAuthService();
 
   // ── State ─────────────────────────────────────────────────────────────────
 
@@ -93,7 +90,6 @@ class UserManagementController extends GetxController {
   Future<void> addUser() async {
     final username = usernameController.text.trim();
     final password = passwordController.text.trim();
-    final role = selectedRole.value;
 
     if (username.isEmpty) {
       _showError('Username tidak boleh kosong');
@@ -104,22 +100,25 @@ class UserManagementController extends GetxController {
       return;
     }
 
+    final exists = await _userService.isUsernameExists(username);
+    if (exists) {
+      _showError('Username sudah digunakan');
+      return;
+    }
+
     isSaving.value = true;
     try {
-      // Create Firebase Auth account in secondary app (preserves admin session)
-      final uid = await _authService.createUser(username, password);
-      if (uid == null) throw Exception('Gagal membuat akun');
-
-      // Write Firestore document
-      final success = await _userService.createUserDoc(uid, username, role);
-      if (!success) throw Exception('Gagal menyimpan data pengguna');
+      final uid = await _userService.createUser(
+        username,
+        password,
+        selectedRole.value,
+      );
+      if (uid == null) throw Exception('Gagal menyimpan data pengguna');
 
       await loadUsers();
       _showSuccess('User berhasil ditambahkan');
       _clearForm();
       Get.back();
-    } on FirebaseAuthException catch (e) {
-      _showError(e.message ?? 'Terjadi kesalahan');
     } catch (e) {
       _showError(e.toString().replaceAll('Exception: ', ''));
     } finally {
@@ -134,7 +133,6 @@ class UserManagementController extends GetxController {
       title: 'Simpan Perubahan',
       message: 'Apakah data sudah benar?',
       confirmText: 'Simpan',
-      isDanger: false,
       onConfirm: () => updateUser(uid),
     );
   }
@@ -146,18 +144,22 @@ class UserManagementController extends GetxController {
       return;
     }
 
+    final exists =
+        await _userService.isUsernameExists(username, excludeUid: uid);
+    if (exists) {
+      _showError('Username sudah digunakan');
+      return;
+    }
+
     isSaving.value = true;
     try {
-      final success = await _userService.updateUser(
-        uid,
-        username,
-        selectedRole.value,
-      );
+      final success =
+          await _userService.updateUser(uid, username, selectedRole.value);
       if (!success) throw Exception('Gagal memperbarui data');
 
       await loadUsers();
-      _showSuccess('Data user berhasil diperbarui');
       Get.back();
+      _showSuccess('Data user berhasil diperbarui');
     } catch (e) {
       _showError(e.toString().replaceAll('Exception: ', ''));
     } finally {
@@ -183,8 +185,8 @@ class UserManagementController extends GetxController {
       final success = await _userService.deleteUserDoc(uid);
       if (!success) throw Exception('Gagal menghapus data');
 
-      users.removeWhere((u) => u.id == uid);
-      filteredUsers.removeWhere((u) => u.id == uid);
+      await loadUsers();
+      Get.back();
       _showSuccess('User berhasil dihapus');
       Get.back();
     } catch (e) {
