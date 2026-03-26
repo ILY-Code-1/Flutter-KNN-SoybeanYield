@@ -65,7 +65,7 @@ class SignInController extends GetxController {
       message,
       backgroundColor: Colors.red.shade400,
       colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.all(16),
     );
   }

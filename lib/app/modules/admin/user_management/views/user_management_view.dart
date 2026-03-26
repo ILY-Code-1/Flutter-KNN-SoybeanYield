@@ -16,86 +16,106 @@ class UserManagementView extends GetView<UserManagementController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: _buildAppBar(),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: _buildSearchBar(),
-          ),
-          Expanded(
-            child: Obx(() {
-              // Loading state
-              if (controller.isLoading.value) {
-                return const Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primaryGreen,
-                  ),
-                );
-              }
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // ── Green header ─────────────────────────────────────────────────
+            _buildHeader(),
 
-              // Empty state
-              if (controller.filteredUsers.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Iconsax.people,
-                        size: 48,
-                        color: AppColors.textSecondary.withValues(alpha: 0.4),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        controller.searchController.text.isEmpty
-                            ? 'Belum ada pengguna'
-                            : 'User tidak ditemukan',
-                        style: GoogleFonts.poppins(
-                          color: AppColors.textSecondary,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              // User list
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: controller.filteredUsers.length,
-                      separatorBuilder: (_, __) =>
-                          const Divider(height: 1, thickness: 0.5),
-                      itemBuilder: (context, index) {
-                        final user = controller.filteredUsers[index];
-                        return UserCardWidget(
-                          user: user,
-                          onTap: () => controller.openDetail(user),
-                        );
-                      },
-                    ),
+            // ── Content section ───────────────────────────────────────────────
+            Transform.translate(
+              offset: const Offset(0, -20),
+              child: Container(
+                width: double.infinity,
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height * 0.6,
+                ),
+                decoration: const BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(24),
                   ),
                 ),
-              );
-            }),
-          ),
-        ],
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+                child: Obx(() {
+                  // Loading state
+                  if (controller.isLoading.value) {
+                    return const Padding(
+                      padding: EdgeInsets.only(top: 60),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primaryGreen,
+                        ),
+                      ),
+                    );
+                  }
+
+                  // Empty state
+                  if (controller.filteredUsers.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 60),
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Iconsax.people,
+                              size: 48,
+                              color:
+                                  AppColors.textSecondary.withValues(alpha: 0.4),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              controller.searchController.text.isEmpty
+                                  ? 'Belum ada pengguna'
+                                  : 'User tidak ditemukan',
+                              style: GoogleFonts.poppins(
+                                color: AppColors.textSecondary,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
+                  // User list
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: controller.filteredUsers.length,
+                        separatorBuilder: (_, __) =>
+                            const Divider(height: 1, thickness: 0.5),
+                        itemBuilder: (context, index) {
+                          final user = controller.filteredUsers[index];
+                          return UserCardWidget(
+                            user: user,
+                            onTap: () => controller.openDetail(user),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: controller.openAdd,
@@ -111,26 +131,6 @@ class UserManagementView extends GetView<UserManagementController> {
       backgroundColor: AppColors.primaryGreen,
       elevation: 0,
       automaticallyImplyLeading: false,
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'User Management',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          Text(
-            'Tambah, ubah, dan atur akses pengguna',
-            style: GoogleFonts.poppins(
-              fontSize: 11,
-              color: Colors.white.withValues(alpha: 0.85),
-            ),
-          ),
-        ],
-      ),
       actions: [
         IconButton(
           icon: const Icon(Iconsax.logout, color: Colors.white),
@@ -138,6 +138,37 @@ class UserManagementView extends GetView<UserManagementController> {
           tooltip: 'Logout',
         ),
       ],
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      width: double.infinity,
+      color: AppColors.primaryGreen,
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'User Management',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Tambah, ubah, dan atur akses pengguna aplikasi.',
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: Colors.white.withValues(alpha: 0.85),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildSearchBar(),
+        ],
+      ),
     );
   }
 
@@ -160,7 +191,7 @@ class UserManagementView extends GetView<UserManagementController> {
           size: 20,
         ),
         filled: true,
-        fillColor: AppColors.inputBackground,
+        fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,

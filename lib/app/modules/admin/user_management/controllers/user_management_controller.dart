@@ -202,10 +202,7 @@ class UserManagementController extends GetxController {
       message: 'Apakah kamu yakin ingin keluar?',
       confirmText: 'Logout',
       isDanger: true,
-      onConfirm: () {
-        _auth.logout();
-        Get.offAllNamed(AppRoutes.signIn);
-      },
+      onConfirm: () => _auth.logoutWithLoading(),
     );
   }
 
@@ -223,7 +220,7 @@ class UserManagementController extends GetxController {
       message,
       backgroundColor: AppColors.primaryGreen,
       colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.all(16),
     );
   }
@@ -234,7 +231,7 @@ class UserManagementController extends GetxController {
       message,
       backgroundColor: Colors.red.shade400,
       colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.all(16),
     );
   }

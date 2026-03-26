@@ -220,7 +220,7 @@ class PredictionDetailUserView extends StatelessWidget {
                           'Fitur unduh segera hadir',
                           backgroundColor: AppColors.primaryGreen,
                           colorText: Colors.white,
-                          snackPosition: SnackPosition.BOTTOM,
+                          snackPosition: SnackPosition.TOP,
                           margin: const EdgeInsets.all(16),
                         );
                       },

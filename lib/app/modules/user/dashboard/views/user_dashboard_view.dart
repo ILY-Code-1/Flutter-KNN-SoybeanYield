@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // ignore: unnecessary_import
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
@@ -15,7 +16,16 @@ class UserDashboardView extends GetView<UserDashboardController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    // PopScope: tangkap tombol back sebelum diteruskan ke sistem.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        if (controller.handleBackPress()) {
+          SystemNavigator.pop(); // keluar app secara native
+        }
+      },
+      child: Scaffold(
       backgroundColor: AppColors.background,
       appBar: _buildAppBar(),
       // Seluruh body scrollable: header hijau + section konten scroll bersama
@@ -83,7 +93,8 @@ class UserDashboardView extends GetView<UserDashboardController> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: const UserBottomNav(currentIndex: 0),
-    );
+      ),
+    ); // tutup PopScope
   }
 
   // ── AppBar ──────────────────────────────────────────────────────────────────

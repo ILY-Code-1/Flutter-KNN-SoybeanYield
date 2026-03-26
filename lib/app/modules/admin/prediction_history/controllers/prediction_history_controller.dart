@@ -142,7 +142,7 @@ class PredictionHistoryController extends GetxController {
       'Fitur unduh belum tersedia',
       backgroundColor: AppColors.primaryGreen,
       colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.all(16),
       icon: const Icon(Icons.info_outline, color: Colors.white),
     );
@@ -154,10 +154,7 @@ class PredictionHistoryController extends GetxController {
       message: 'Apakah kamu yakin ingin keluar?',
       confirmText: 'Logout',
       isDanger: true,
-      onConfirm: () {
-        _auth.logout();
-        Get.offAllNamed(AppRoutes.signIn);
-      },
+      onConfirm: () => _auth.logoutWithLoading(),
     );
   }
 }

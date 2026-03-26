@@ -23,114 +23,99 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
         if (prediction == null) {
           return const Center(child: CircularProgressIndicator());
         }
-        return Column(
-          children: [
-            // Green header — seamlessly extends AppBar
-            Container(
-              width: double.infinity,
-              color: AppColors.primaryGreen,
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Predictions Detail',
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.white,
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              // ── Green header ───────────────────────────────────────────────
+              _buildHeader(),
+
+              // ── Content section ────────────────────────────────────────────
+              Transform.translate(
+                offset: const Offset(0, -20),
+                child: Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(24),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Unduh dan bagikan hasil prediksi',
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: Colors.white.withValues(alpha: 0.85),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Scrollable body
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ── Estimasi Hasil Panen ──
-                    Center(
-                      child: Text(
-                        'Estimasi Hasil Panen',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primaryGreen,
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── Estimasi Hasil Panen ───────────────────────────────
+                      Center(
+                        child: Text(
+                          'Estimasi Hasil Panen',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryGreen,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildResultCard(prediction.result),
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 12),
+                      _buildResultCard(prediction.result),
+                      const SizedBox(height: 24),
 
-                    // ── Detail Input ──
-                    Text(
-                      'Detail Input',
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                      // ── Detail Input ───────────────────────────────────────
+                      Text(
+                        'Detail Input',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    _buildInputDetailCard(prediction),
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 10),
+                      _buildInputDetailCard(prediction),
+                      const SizedBox(height: 24),
 
-                    // ── Tanggal Prediksi ──
-                    Text(
-                      'Tanggal Prediksi',
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                      // ── Tanggal Prediksi ───────────────────────────────────
+                      Text(
+                        'Tanggal Prediksi',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    _buildInfoChip(
-                      icon: Iconsax.calendar,
-                      text: DateFormat('dd/MM/yyyy').format(prediction.date),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // ── Pembuat Prediksi ──
-                    Text(
-                      'Pembuat Prediksi',
-                      style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                      const SizedBox(height: 10),
+                      _buildInfoChip(
+                        icon: Iconsax.calendar,
+                        text: DateFormat('dd/MM/yyyy').format(prediction.date),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    _buildInfoChip(
-                      icon: Iconsax.user,
-                      text: prediction.username,
-                    ),
-                    const SizedBox(height: 28),
+                      const SizedBox(height: 20),
 
-                    // ── Download button ──
-                    PrimaryButton(
-                      text: 'Unduh Hasil Prediksi',
-                      onPressed: controller.downloadResult,
-                      backgroundColor: AppColors.primaryGreen,
-                    ),
-                    const SizedBox(height: 24),
-                  ],
+                      // ── Pembuat Prediksi ───────────────────────────────────
+                      Text(
+                        'Pembuat Prediksi',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildInfoChip(
+                        icon: Iconsax.user,
+                        text: prediction.username,
+                      ),
+                      const SizedBox(height: 28),
+
+                      // ── Download button ────────────────────────────────────
+                      PrimaryButton(
+                        text: 'Unduh Hasil Prediksi',
+                        onPressed: controller.downloadResult,
+                        backgroundColor: AppColors.primaryGreen,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       }),
       bottomNavigationBar: const AdminBottomNav(currentIndex: 3),
@@ -152,6 +137,35 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
           tooltip: 'Logout',
         ),
       ],
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      width: double.infinity,
+      color: AppColors.primaryGreen,
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Detail Prediksi',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Unduh dan bagikan hasil prediksi.',
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: Colors.white.withValues(alpha: 0.85),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -224,7 +238,9 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
       ),
       child: Column(
         children: [
-          DetailRowWidget(label: 'Suhu', value: '${prediction.suhu.toStringAsFixed(0)}°C'),
+          DetailRowWidget(
+              label: 'Suhu',
+              value: '${prediction.suhu.toStringAsFixed(0)}°C'),
           const SizedBox(height: 10),
           DetailRowWidget(
               label: 'Curah Hujan',

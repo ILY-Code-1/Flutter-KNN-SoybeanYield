@@ -40,7 +40,7 @@ class DatasetManagementController extends GetxController {
       'Dataset berhasil ditambahkan',
       backgroundColor: AppColors.primaryGreen,
       colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.all(16),
     );
   }
@@ -70,7 +70,7 @@ class DatasetManagementController extends GetxController {
         'Semua field harus diisi dengan angka yang valid',
         backgroundColor: Colors.red.shade400,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         margin: const EdgeInsets.all(16),
       );
       return;
@@ -120,7 +120,7 @@ class DatasetManagementController extends GetxController {
       'dataset.txt siap untuk diupload',
       backgroundColor: AppColors.primaryGreen,
       colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
+      snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.all(16),
     );
   }
@@ -132,7 +132,7 @@ class DatasetManagementController extends GetxController {
         'Pilih file terlebih dahulu',
         backgroundColor: Colors.red.shade400,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         margin: const EdgeInsets.all(16),
       );
       return;
@@ -149,7 +149,7 @@ class DatasetManagementController extends GetxController {
           'Dataset berhasil diupload ke sistem',
           backgroundColor: AppColors.primaryGreen,
           colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
+          snackPosition: SnackPosition.TOP,
           margin: const EdgeInsets.all(16),
         );
         selectedFileName.value = null;
@@ -171,10 +171,7 @@ class DatasetManagementController extends GetxController {
       message: 'Apakah kamu yakin ingin keluar?',
       confirmText: 'Logout',
       isDanger: true,
-      onConfirm: () {
-        _auth.logout();
-        Get.offAllNamed(AppRoutes.signIn);
-      },
+      onConfirm: () => _auth.logoutWithLoading(),
     );
   }
 

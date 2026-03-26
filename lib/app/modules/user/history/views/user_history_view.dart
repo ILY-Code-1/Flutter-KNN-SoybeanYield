@@ -113,32 +113,28 @@ class UserHistoryView extends GetView<UserHistoryController> {
     return Container(
       width: double.infinity,
       color: AppColors.primaryGreen,
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 12),
-            Text(
-              'Riwayat Prediksi',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Riwayat Prediksi',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Lihat hasil prediksi sebelumnya\ndan pantau performa Anda.',
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                color: Colors.white.withValues(alpha: 0.85),
-                height: 1.5,
-              ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Lihat hasil prediksi sebelumnya\ndan pantau performa Anda.',
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: Colors.white.withValues(alpha: 0.85),
+              height: 1.5,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

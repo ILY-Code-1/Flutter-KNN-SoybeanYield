@@ -65,7 +65,7 @@ class PredictionController extends GetxController {
         'Semua field harus diisi dengan angka yang valid',
         backgroundColor: Colors.red.shade400,
         colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
         margin: const EdgeInsets.all(16),
       );
       return;

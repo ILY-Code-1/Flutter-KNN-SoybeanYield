@@ -17,151 +17,171 @@ class UserDetailView extends GetView<UserManagementController> {
       backgroundColor: AppColors.background,
       appBar: _buildAppBar(),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.all(20),
-          child: Obx(() {
-            final isEdit = controller.selectedUser.value != null;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Username ────────────────────────────────────────────────
-                _fieldLabel('Username'),
-                const SizedBox(height: 8),
-                _textField(
-                  controller: controller.usernameController,
-                  hint: 'Masukan username',
-                ),
-                const SizedBox(height: 20),
+        child: Column(
+          children: [
+            // ── Green header ─────────────────────────────────────────────────
+            _buildHeader(),
 
-                // ── Password (ADD mode only) ─────────────────────────────────
-                if (!isEdit) ...[
-                  _fieldLabel('Password'),
-                  const SizedBox(height: 8),
-                  Obx(
-                    () => TextField(
-                      controller: controller.passwordController,
-                      obscureText: !controller.isPasswordVisible.value,
-                      style: GoogleFonts.poppins(
-                          fontSize: 14, color: AppColors.textPrimary),
-                      decoration: InputDecoration(
-                        hintText: 'Min. 6 karakter',
-                        hintStyle: GoogleFonts.poppins(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                        ),
-                        filled: true,
-                        fillColor: AppColors.inputBackground,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            controller.isPasswordVisible.value
-                                ? Iconsax.eye
-                                : Iconsax.eye_slash,
-                            color: AppColors.textSecondary,
-                            size: 20,
-                          ),
-                          onPressed: controller.togglePasswordVisibility,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
+            // ── Content section ───────────────────────────────────────────────
+            Transform.translate(
+              offset: const Offset(0, -20),
+              child: Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                ),
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                ],
+                  padding: const EdgeInsets.all(20),
+                  child: Obx(() {
+                    final isEdit = controller.selectedUser.value != null;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // ── Username ─────────────────────────────────────────
+                        _fieldLabel('Username'),
+                        const SizedBox(height: 8),
+                        _textField(
+                          controller: controller.usernameController,
+                          hint: 'Masukan username',
+                        ),
+                        const SizedBox(height: 20),
 
-                // ── Role ────────────────────────────────────────────────────
-                _fieldLabel('Role'),
-                const SizedBox(height: 8),
-                Obx(
-                  () => _dropdownField(
-                    value: controller.selectedRole.value,
-                    items: const ['admin', 'user'],
-                    displayLabels: const {'admin': 'Admin', 'user': 'User'},
-                    onChanged: (val) {
-                      if (val != null) controller.selectedRole.value = val;
-                    },
-                  ),
+                        // ── Password (ADD mode only) ──────────────────────────
+                        if (!isEdit) ...[
+                          _fieldLabel('Password'),
+                          const SizedBox(height: 8),
+                          Obx(
+                            () => TextField(
+                              controller: controller.passwordController,
+                              obscureText: !controller.isPasswordVisible.value,
+                              style: GoogleFonts.poppins(
+                                  fontSize: 14, color: AppColors.textPrimary),
+                              decoration: InputDecoration(
+                                hintText: 'Min. 6 karakter',
+                                hintStyle: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  color: AppColors.textSecondary,
+                                ),
+                                filled: true,
+                                fillColor: AppColors.inputBackground,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    controller.isPasswordVisible.value
+                                        ? Iconsax.eye
+                                        : Iconsax.eye_slash,
+                                    color: AppColors.textSecondary,
+                                    size: 20,
+                                  ),
+                                  onPressed: controller.togglePasswordVisibility,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+
+                        // ── Role ─────────────────────────────────────────────
+                        _fieldLabel('Role'),
+                        const SizedBox(height: 8),
+                        Obx(
+                          () => _dropdownField(
+                            value: controller.selectedRole.value,
+                            items: const ['admin', 'user'],
+                            displayLabels: const {
+                              'admin': 'Admin',
+                              'user': 'User'
+                            },
+                            onChanged: (val) {
+                              if (val != null) controller.selectedRole.value = val;
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // ── Created At (EDIT mode only) ───────────────────────
+                        if (isEdit) ...[
+                          _fieldLabel('Created At'),
+                          const SizedBox(height: 8),
+                          _textField(
+                            controller: TextEditingController(
+                              text: DateFormat('yyyy-MM-dd').format(
+                                  controller.selectedUser.value!.createdAt),
+                            ),
+                            hint: '',
+                            enabled: false,
+                          ),
+                          const SizedBox(height: 32),
+                        ] else
+                          const SizedBox(height: 12),
+
+                        // ── Buttons ──────────────────────────────────────────
+                        if (isEdit) ...[
+                          Obx(
+                            () => _actionButton(
+                              label: 'UPDATE',
+                              color: AppColors.accentTeal,
+                              isLoading: controller.isSaving.value,
+                              onPressed: () => controller.confirmUpdate(
+                                  controller.selectedUser.value!.id),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Obx(
+                            () => _actionButton(
+                              label: 'DELETE',
+                              color: AppColors.deleteRed,
+                              isLoading: controller.isSaving.value,
+                              onPressed: () => controller.confirmDelete(
+                                  controller.selectedUser.value!.id),
+                            ),
+                          ),
+                        ] else ...[
+                          Obx(
+                            () => _actionButton(
+                              label: 'TAMBAH USER',
+                              color: AppColors.primaryGreen,
+                              isLoading: controller.isSaving.value,
+                              onPressed: controller.addUser,
+                            ),
+                          ),
+                        ],
+                      ],
+                    );
+                  }),
                 ),
-                const SizedBox(height: 20),
-
-                // ── Created At (EDIT mode only) ──────────────────────────────
-                if (isEdit) ...[
-                  _fieldLabel('Created At'),
-                  const SizedBox(height: 8),
-                  _textField(
-                    controller: TextEditingController(
-                      text: DateFormat('yyyy-MM-dd')
-                          .format(controller.selectedUser.value!.createdAt),
-                    ),
-                    hint: '',
-                    enabled: false,
-                  ),
-                  const SizedBox(height: 32),
-                ] else
-                  const SizedBox(height: 12),
-
-                // ── Buttons ─────────────────────────────────────────────────
-                if (isEdit) ...[
-                  // UPDATE
-                  Obx(
-                    () => _actionButton(
-                      label: 'UPDATE',
-                      color: AppColors.accentTeal,
-                      isLoading: controller.isSaving.value,
-                      onPressed: () => controller
-                          .confirmUpdate(controller.selectedUser.value!.id),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // DELETE
-                  Obx(
-                    () => _actionButton(
-                      label: 'DELETE',
-                      color: AppColors.deleteRed,
-                      isLoading: controller.isSaving.value,
-                      onPressed: () => controller
-                          .confirmDelete(controller.selectedUser.value!.id),
-                    ),
-                  ),
-                ] else ...[
-                  // TAMBAH USER
-                  Obx(
-                    () => _actionButton(
-                      label: 'TAMBAH USER',
-                      color: AppColors.primaryGreen,
-                      isLoading: controller.isSaving.value,
-                      onPressed: controller.addUser,
-                    ),
-                  ),
-                ],
-              ],
-            );
-          }),
+              ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: const AdminBottomNav(currentIndex: 1),
     );
   }
 
-  // ── AppBar ─────────────────────────────────────────────────────────────────
+  // ── AppBar ──────────────────────────────────────────────────────────────────
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
@@ -171,31 +191,6 @@ class UserDetailView extends GetView<UserManagementController> {
         icon: const Icon(Iconsax.arrow_left, color: Colors.white),
         onPressed: () => Get.back(),
       ),
-      title: Obx(() {
-        final isEdit = controller.selectedUser.value != null;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              isEdit ? 'User Detail' : 'Tambah User',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            Text(
-              isEdit
-                  ? 'Kelola Pengguna dengan Mudah'
-                  : 'Buat akun pengguna baru',
-              style: GoogleFonts.poppins(
-                fontSize: 11,
-                color: Colors.white.withValues(alpha: 0.85),
-              ),
-            ),
-          ],
-        );
-      }),
       actions: [
         IconButton(
           icon: const Icon(Iconsax.logout, color: Colors.white),
@@ -206,7 +201,41 @@ class UserDetailView extends GetView<UserManagementController> {
     );
   }
 
-  // ── Reusable field widgets ─────────────────────────────────────────────────
+  // ── Green header ────────────────────────────────────────────────────────────
+
+  Widget _buildHeader() {
+    return Obx(() {
+      final isEdit = controller.selectedUser.value != null;
+      return Container(
+        width: double.infinity,
+        color: AppColors.primaryGreen,
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isEdit ? 'User Detail' : 'Tambah User',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              isEdit ? 'Kelola pengguna dengan mudah.' : 'Buat akun pengguna baru.',
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: Colors.white.withValues(alpha: 0.85),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  // ── Reusable field widgets ──────────────────────────────────────────────────
 
   Widget _fieldLabel(String label) {
     return Text(
@@ -235,8 +264,7 @@ class UserDetailView extends GetView<UserManagementController> {
           color: AppColors.textSecondary,
         ),
         filled: true,
-        fillColor:
-            enabled ? AppColors.inputBackground : const Color(0xFFF5F5F5),
+        fillColor: enabled ? AppColors.inputBackground : const Color(0xFFF5F5F5),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -289,7 +317,6 @@ class UserDetailView extends GetView<UserManagementController> {
     );
   }
 
-  /// Full-width action button with integrated loading spinner.
   Widget _actionButton({
     required String label,
     required Color color,

@@ -6,13 +6,39 @@ import '../../../../constants/app_colors.dart';
 import '../../../../core/auth/auth_controller.dart';
 import '../../../../data/dummy/dashboard_dummy.dart';
 import '../../../../global_widgets/confirm_dialog.dart';
-import '../../../../routes/app_routes.dart';
 import '../models/dashboard_stat_model.dart';
 
 class DashboardController extends GetxController {
   final _auth = Get.find<AuthController>();
 
   late final List<DashboardStatModel> stats;
+
+  // ── Double back to exit ────────────────────────────────────────────────────
+  // Simpan waktu terakhir tombol back ditekan untuk deteksi double-tap.
+  DateTime? _lastBackPress;
+
+  /// Dipanggil dari PopScope di DashboardView.
+  /// Return true  → izinkan app keluar (back kedua dalam 2 detik).
+  /// Return false → tampilkan snackbar, tahan back.
+  /// Ubah durasi threshold (2 detik) jika terlalu cepat/lambat.
+  bool handleBackPress() {
+    final now = DateTime.now();
+    const threshold = Duration(seconds: 2); // ubah jika perlu
+    if (_lastBackPress == null || now.difference(_lastBackPress!) > threshold) {
+      _lastBackPress = now;
+      Get.snackbar(
+        'Keluar Aplikasi',
+        'Tekan sekali lagi untuk keluar',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.black87,
+        colorText: Colors.white,
+        margin: const EdgeInsets.all(16),
+        duration: threshold,
+      );
+      return false;
+    }
+    return true; // back kedua dalam threshold → keluar
+  }
 
   @override
   void onInit() {
@@ -51,10 +77,9 @@ class DashboardController extends GetxController {
       message: 'Apakah kamu yakin ingin keluar?',
       confirmText: 'Logout',
       isDanger: true,
-      onConfirm: () {
-        _auth.logout();
-        Get.offAllNamed(AppRoutes.signIn);
-      },
+      // logoutWithLoading() menampilkan overlay loading, await Firebase signOut,
+      // lalu navigasi ke signIn — tidak perlu Get.offAllNamed manual di sini.
+      onConfirm: () => _auth.logoutWithLoading(),
     );
   }
 }

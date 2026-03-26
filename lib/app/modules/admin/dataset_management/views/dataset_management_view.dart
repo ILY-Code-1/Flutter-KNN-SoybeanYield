@@ -16,61 +16,44 @@ class DatasetManagementView extends GetView<DatasetManagementController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: _buildAppBar(),
-      body: Column(
-        children: [
-          // ── Green header — seamlessly extends AppBar ──
-          Container(
-            width: double.infinity,
-            color: AppColors.primaryGreen,
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Kelola Dataset',
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.white,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // ── Green header ─────────────────────────────────────────────────
+            _buildHeader(),
+
+            // ── Content section ───────────────────────────────────────────────
+            Transform.translate(
+              offset: const Offset(0, -20),
+              child: Container(
+                width: double.infinity,
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height * 0.6,
+                ),
+                decoration: const BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(24),
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Kelola dataset untuk memastikan prediksi tetap akurat.',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: Colors.white.withValues(alpha: 0.85),
-                  ),
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // .toList() memanggil iterator RxList secara internal,
+                    // yang mengakses .value → men-trigger proxy tracking GetX.
+                    // Tanpa ini, Obx tidak mendaftarkan subscription dan error "improper use".
+                    Obx(() => DatasetTableWidget(datasets: controller.datasets.toList())),
+                    const SizedBox(height: 20),
+                    _buildUploadButton(),
+                    const SizedBox(height: 12),
+                    _buildManualButton(),
+                  ],
                 ),
-              ],
-            ),
-          ),
-
-          // ── Scrollable body ──
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Data table
-                  Obx(
-                    () => DatasetTableWidget(datasets: controller.datasets),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Upload Dataset button (outlined)
-                  _buildUploadButton(),
-                  const SizedBox(height: 12),
-
-                  // Tambah Manual button (amber)
-                  _buildManualButton(),
-                  const SizedBox(height: 24),
-                ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: const AdminBottomNav(currentIndex: 2),
     );
@@ -91,16 +74,43 @@ class DatasetManagementView extends GetView<DatasetManagementController> {
     );
   }
 
+  Widget _buildHeader() {
+    return Container(
+      width: double.infinity,
+      color: AppColors.primaryGreen,
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Kelola Dataset',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Kelola dataset untuk memastikan prediksi\ntetap akurat.',
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: Colors.white.withValues(alpha: 0.85),
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildUploadButton() {
     return SizedBox(
       width: double.infinity,
       height: 50,
       child: OutlinedButton.icon(
         onPressed: controller.openUploadDataset,
-        icon: const Icon(
-          Icons.file_upload_outlined,
-          color: AppColors.primaryGreen,
-        ),
+        icon: const Icon(Icons.file_upload_outlined, color: AppColors.primaryGreen),
         label: Text(
           'Upload Dataset',
           style: GoogleFonts.poppins(
