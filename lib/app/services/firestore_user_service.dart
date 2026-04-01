@@ -4,7 +4,7 @@ import '../modules/admin/user_management/models/user_model.dart';
 
 class FirestoreUserService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  static const String _collection = 'users-soybean';
+  static const String _collection = 'users_soybean';
 
   // ── Auth ──────────────────────────────────────────────────────────────────
 
