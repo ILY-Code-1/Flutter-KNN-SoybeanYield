@@ -123,13 +123,26 @@ class InputPrediksiView extends GetView<PredictionController> {
                             ),
                           ),
                           child: controller.isLoading.value
-                              ? const SizedBox(
-                                  width: 22,
-                                  height: 22,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2.5,
-                                  ),
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.black54,
+                                        strokeWidth: 2.5,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      controller.loadingMessage.value,
+                                      style: AppTextStyles.buttonText(context)
+                                          .copyWith(
+                                              color: const Color(0xFF212121),
+                                              fontSize: 12),
+                                    ),
+                                  ],
                                 )
                               : Text(
                                   'HITUNG PREDIKSI',

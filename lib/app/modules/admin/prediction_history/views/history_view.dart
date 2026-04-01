@@ -38,6 +38,17 @@ class HistoryView extends GetView<PredictionHistoryController> {
                 ),
                 padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
                 child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(48),
+                        child: CircularProgressIndicator(
+                          color: AppColors.primaryGreen,
+                        ),
+                      ),
+                    );
+                  }
+
                   if (controller.filteredPredictions.isEmpty) {
                     return Container(
                       width: double.infinity,
@@ -123,6 +134,11 @@ class HistoryView extends GetView<PredictionHistoryController> {
       automaticallyImplyLeading: false,
       actions: [
         IconButton(
+          icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+          onPressed: controller.loadPredictions,
+          tooltip: 'Refresh',
+        ),
+        IconButton(
           icon: const Icon(Iconsax.logout, color: Colors.white),
           onPressed: controller.logout,
           tooltip: 'Logout',
@@ -156,7 +172,6 @@ class HistoryView extends GetView<PredictionHistoryController> {
             ),
           ),
           const SizedBox(height: 16),
-          // Filter button inside header
           Obx(() => _buildFilterButton()),
         ],
       ),
@@ -164,6 +179,8 @@ class HistoryView extends GetView<PredictionHistoryController> {
   }
 
   Widget _buildFilterButton() {
+    final hasFilter =
+        controller.filterFrom.value != null || controller.filterTo.value != null;
     return GestureDetector(
       onTap: controller.showFilterSheet,
       child: Container(
@@ -175,25 +192,22 @@ class HistoryView extends GetView<PredictionHistoryController> {
         ),
         child: Row(
           children: [
-            const Icon(
+            Icon(
               Iconsax.calendar,
-              color: AppColors.primaryGreen,
+              color: hasFilter ? AppColors.orange : AppColors.primaryGreen,
               size: 20,
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                controller.selectedFilter.value == 'Semua'
-                    ? 'Filter Waktu Prediksi'
-                    : controller.selectedFilter.value,
+                controller.filterLabel.value,
                 style: GoogleFonts.poppins(
                   fontSize: 14,
-                  color: controller.selectedFilter.value == 'Semua'
-                      ? AppColors.textSecondary
-                      : AppColors.primaryGreen,
-                  fontWeight: controller.selectedFilter.value == 'Semua'
-                      ? FontWeight.w400
-                      : FontWeight.w500,
+                  color: hasFilter
+                      ? AppColors.orange
+                      : AppColors.textSecondary,
+                  fontWeight:
+                      hasFilter ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
             ),

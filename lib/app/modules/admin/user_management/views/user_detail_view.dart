@@ -117,8 +117,9 @@ class UserDetailView extends GetView<UserManagementController> {
                               'user': 'User'
                             },
                             onChanged: (val) {
-                              if (val != null)
+                              if (val != null) {
                                 controller.selectedRole.value = val;
+                              }
                             },
                           ),
                         ),

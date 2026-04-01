@@ -39,6 +39,17 @@ class UserHistoryView extends GetView<UserHistoryController> {
                 ),
                 padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
                 child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Padding(
+                      padding: EdgeInsets.all(48),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primaryGreen,
+                        ),
+                      ),
+                    );
+                  }
+
                   if (controller.histories.isEmpty) {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -132,6 +143,11 @@ class UserHistoryView extends GetView<UserHistoryController> {
       elevation: 0,
       automaticallyImplyLeading: false,
       actions: [
+        IconButton(
+          icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+          onPressed: controller.loadHistory,
+          tooltip: 'Refresh',
+        ),
         IconButton(
           icon: const Icon(Iconsax.logout, color: Colors.white),
           onPressed: controller.confirmLogout,

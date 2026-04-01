@@ -150,24 +150,50 @@ class DatasetUploadView extends GetView<DatasetManagementController> {
                       const SizedBox(height: 28),
 
                       // ── SIMPAN DATASET button ─────────────────────────────
-                      SizedBox(
-                        height: 52,
-                        child: ElevatedButton(
-                          onPressed: controller.saveUploadedFile,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFFC107),
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
+                      Obx(() => SizedBox(
+                            height: 52,
+                            child: ElevatedButton(
+                              onPressed: controller.isUploading.value
+                                  ? null
+                                  : controller.saveUploadedFile,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFFC107),
+                                disabledBackgroundColor:
+                                    const Color(0xFFFFE082),
+                                elevation: 2,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                              ),
+                              child: controller.isUploading.value
+                                  ? const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.black54,
+                                            strokeWidth: 2.5,
+                                          ),
+                                        ),
+                                        SizedBox(width: 10),
+                                        Text(
+                                          'Mengupload...',
+                                          style: TextStyle(
+                                              color: Color(0xFF212121)),
+                                        ),
+                                      ],
+                                    )
+                                  : Text(
+                                      'SIMPAN DATASET',
+                                      style: AppTextStyles.buttonText(context)
+                                          .copyWith(
+                                              color: const Color(0xFF212121)),
+                                    ),
                             ),
-                          ),
-                          child: Text(
-                            'SIMPAN DATASET',
-                            style: AppTextStyles.buttonText(context)
-                                .copyWith(color: const Color(0xFF212121)),
-                          ),
-                        ),
-                      ),
+                          )),
                     ],
                   ),
                 ),

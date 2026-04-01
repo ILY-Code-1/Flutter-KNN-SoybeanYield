@@ -147,13 +147,16 @@ class DashboardView extends GetView<DashboardController> {
   }
 
   Widget _buildStatRow() {
-    return Row(
-      children: [
-        for (int i = 0; i < controller.stats.length; i++) ...[
-          Expanded(child: StatCardWidget(stat: controller.stats[i])),
-          if (i < controller.stats.length - 1) const SizedBox(width: 8),
+    return Obx(() {
+      final stats = controller.stats;
+      return Row(
+        children: [
+          for (int i = 0; i < stats.length; i++) ...[
+            Expanded(child: StatCardWidget(stat: stats[i])),
+            if (i < stats.length - 1) const SizedBox(width: 8),
+          ],
         ],
-      ],
-    );
+      );
+    });
   }
 }

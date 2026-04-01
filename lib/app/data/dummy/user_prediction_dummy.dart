@@ -4,6 +4,8 @@ class UserPredictionDummy {
   static List<UserPredictionModel> getHistory() => [
         UserPredictionModel(
           id: '1',
+          userId: 'dummy_user',
+          username: 'Petani',
           date: DateTime(2026, 3, 12),
           result: 3.1,
           suhu: 29,
@@ -16,6 +18,8 @@ class UserPredictionDummy {
         ),
         UserPredictionModel(
           id: '2',
+          userId: 'dummy_user',
+          username: 'Petani',
           date: DateTime(2026, 4, 12),
           result: 5.0,
           suhu: 28,

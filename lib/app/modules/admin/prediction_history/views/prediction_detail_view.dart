@@ -74,7 +74,7 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
                       _buildInfoChip(
                         context: context,
                         icon: Iconsax.calendar,
-                        text: DateFormat('dd/MM/yyyy')
+                        text: DateFormat('dd/MM/yyyy, HH:mm')
                             .format(prediction.date),
                       ),
                       const SizedBox(height: 20),
@@ -92,21 +92,22 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
                       ),
                       const SizedBox(height: 20),
 
-                      // ── Data Hasil Panen Aktual ────────────────────────────
+                      // ── Data Hasil Panen Aktual (read-only) ────────────────
                       Text(
                         'Data Hasil Panen Aktual',
                         style: AppTextStyles.sectionTitle(context),
                       ),
                       const SizedBox(height: 10),
-                      _buildHasilPanenAktualField(context),
+                      _buildActualYieldChip(context, prediction.actualYield),
                       const SizedBox(height: 28),
 
-                      // ── Download button ────────────────────────────────────
-                      PrimaryButton(
-                        text: 'Unduh Hasil Prediksi',
-                        onPressed: controller.downloadResult,
-                        backgroundColor: AppColors.primaryGreen,
-                      ),
+                      // ── Download PDF button (admin only) ───────────────────
+                      Obx(() => PrimaryButton(
+                            text: 'Download PDF',
+                            onPressed: controller.downloadPdf,
+                            isLoading: controller.isGeneratingPdf.value,
+                            backgroundColor: AppColors.primaryGreen,
+                          )),
                     ],
                   ),
                 ),
@@ -175,7 +176,7 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${result.toStringAsFixed(2)} ton/ha',
+                '${result.toStringAsFixed(3)} ton/ha',
                 style: AppTextStyles.resultValue(context),
               ),
               Text(
@@ -201,31 +202,31 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
         children: [
           DetailRowWidget(
               label: 'Suhu',
-              value: '${prediction.suhu.toStringAsFixed(0)}°C'),
+              value: '${prediction.suhu.toStringAsFixed(1)}°C'),
           const SizedBox(height: 10),
           DetailRowWidget(
               label: 'Curah Hujan',
-              value: '${prediction.curahHujan.toStringAsFixed(0)} mm'),
+              value: '${prediction.curahHujan.toStringAsFixed(1)} mm'),
           const SizedBox(height: 10),
           DetailRowWidget(
               label: 'Kelembaban',
-              value: '${prediction.kelembaban.toStringAsFixed(0)}%'),
+              value: '${prediction.kelembaban.toStringAsFixed(1)}%'),
           const SizedBox(height: 10),
           DetailRowWidget(
               label: 'pH Tanah',
-              value: prediction.phTanah.toStringAsFixed(1)),
+              value: prediction.phTanah.toStringAsFixed(2)),
           const SizedBox(height: 10),
           DetailRowWidget(
               label: 'Nitrogen',
-              value: '${prediction.nitrogen.toStringAsFixed(0)} mg/kg'),
+              value: '${prediction.nitrogen.toStringAsFixed(1)} mg/kg'),
           const SizedBox(height: 10),
           DetailRowWidget(
               label: 'Fosfor',
-              value: '${prediction.fosfor.toStringAsFixed(0)} mg/kg'),
+              value: '${prediction.fosfor.toStringAsFixed(1)} mg/kg'),
           const SizedBox(height: 10),
           DetailRowWidget(
               label: 'Kalium',
-              value: '${prediction.kalium.toStringAsFixed(0)} mg/kg'),
+              value: '${prediction.kalium.toStringAsFixed(1)} mg/kg'),
         ],
       ),
     );
@@ -247,47 +248,39 @@ class PredictionDetailView extends GetView<PredictionHistoryController> {
         children: [
           Icon(icon, color: AppColors.white, size: 20),
           const SizedBox(width: 12),
-          Text(text, style: AppTextStyles.chipText(context)),
+          Expanded(child: Text(text, style: AppTextStyles.chipText(context))),
         ],
       ),
     );
   }
 
-  /// Field input hasil panen aktual — sama dengan style chip tanggal (accentTeal).
-  Widget _buildHasilPanenAktualField(BuildContext context) {
+  Widget _buildActualYieldChip(BuildContext context, double? actualYield) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: AppColors.accentTeal,
+        color: actualYield != null
+            ? AppColors.accentTeal
+            : AppColors.textSecondary.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          const Icon(Iconsax.chart_21, color: Colors.white, size: 20),
-          const SizedBox(width: 10),
-          Expanded(
-            child: TextField(
-              controller: controller.hasilPanenAktualController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-              style: AppTextStyles.chipText(context),
-              onChanged: (_) {},
-              decoration: InputDecoration(
-                hintText: 'e.g. 2.5',
-                hintStyle: AppTextStyles.chipText(context)
-                    .copyWith(color: Colors.white60),
-                suffixText: 'ton/ha',
-                suffixStyle: AppTextStyles.inputLabel(context)
-                    .copyWith(color: Colors.white),
-                border: InputBorder.none,
-              ),
-            ),
+          Icon(
+            Iconsax.chart_21,
+            color: actualYield != null ? Colors.white : AppColors.textSecondary,
+            size: 20,
           ),
-          IconButton(
-            icon: const Icon(Icons.save_outlined,
-                color: Colors.white, size: 20),
-            tooltip: 'Simpan',
-            onPressed: controller.saveHasilPanenAktual,
+          const SizedBox(width: 12),
+          Text(
+            actualYield != null
+                ? '${actualYield.toStringAsFixed(3)} ton/ha'
+                : '-',
+            style: AppTextStyles.chipText(context).copyWith(
+              color: actualYield != null
+                  ? Colors.white
+                  : AppColors.textSecondary,
+            ),
           ),
         ],
       ),

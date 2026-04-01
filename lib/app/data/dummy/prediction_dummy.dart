@@ -6,6 +6,7 @@ class PredictionDummy {
           id: '1',
           date: DateTime(2026, 3, 12),
           username: 'Alif',
+          userId: 'dummy_1',
           result: 3.1,
           suhu: 29,
           curahHujan: 900,
@@ -19,6 +20,7 @@ class PredictionDummy {
           id: '2',
           date: DateTime(2026, 4, 12),
           username: 'Alif',
+          userId: 'dummy_1',
           result: 5.0,
           suhu: 28,
           curahHujan: 850,
@@ -32,6 +34,7 @@ class PredictionDummy {
           id: '3',
           date: DateTime(2026, 3, 5),
           username: 'Dimas',
+          userId: 'dummy_2',
           result: 2.94,
           suhu: 30,
           curahHujan: 920,
@@ -45,6 +48,7 @@ class PredictionDummy {
           id: '4',
           date: DateTime(2026, 2, 20),
           username: 'Aldi',
+          userId: 'dummy_3',
           result: 4.2,
           suhu: 27,
           curahHujan: 870,
@@ -55,12 +59,4 @@ class PredictionDummy {
           kalium: 140,
         ),
       ];
-
-  /// All available filter options derived from dummy data
-  static const List<String> filterOptions = [
-    'Semua',
-    'Februari 2026',
-    'Maret 2026',
-    'April 2026',
-  ];
 }

@@ -40,15 +40,27 @@ class DatasetManagementView extends GetView<DatasetManagementController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Obx(() => DatasetTableWidget(
-                          datasets: controller.datasets.toList(),
-                          onDelete: (dataset) =>
-                              controller.confirmDelete(dataset.id),
-                        )),
-                    const SizedBox(height: 20),
                     _buildUploadButton(context),
                     const SizedBox(height: 12),
                     _buildManualButton(context),
+                    const SizedBox(height: 20),
+                    Obx(() {
+                      if (controller.isLoading.value) {
+                        return const Padding(
+                          padding: EdgeInsets.all(48),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primaryGreen,
+                            ),
+                          ),
+                        );
+                      }
+                      return DatasetTableWidget(
+                        datasets: controller.datasets.toList(),
+                        onDelete: (dataset) =>
+                            controller.confirmDelete(dataset.id),
+                      );
+                    }),
                   ],
                 ),
               ),

@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import '../../../../constants/app_colors.dart';
 import '../../../../constants/app_text_styles.dart';
 import '../../../../global_widgets/fullscreen_app_bar.dart';
+import '../../../../services/firestore_dataset_service.dart';
+import '../../../../services/firestore_prediction_service.dart';
 import '../../history/models/user_prediction_model.dart';
 import '../widgets/detail_row_widget.dart';
 
@@ -22,6 +24,24 @@ class PredictionDetailUserView extends StatefulWidget {
 class _PredictionDetailUserViewState extends State<PredictionDetailUserView> {
   final TextEditingController _hasilPanenAktualController =
       TextEditingController();
+  final _predictionService = FirestorePredictionService();
+  final _datasetService = FirestoreDatasetService();
+
+  bool _isSaving = false;
+
+  late UserPredictionModel _model;
+
+  @override
+  void initState() {
+    super.initState();
+    _model = Get.arguments as UserPredictionModel;
+
+    // Pre-fill actual yield if already set
+    if (_model.actualYield != null) {
+      _hasilPanenAktualController.text =
+          _model.actualYield!.toStringAsFixed(3);
+    }
+  }
 
   @override
   void dispose() {
@@ -29,10 +49,80 @@ class _PredictionDetailUserViewState extends State<PredictionDetailUserView> {
     super.dispose();
   }
 
+  Future<void> _saveActualYield() async {
+    final text = _hasilPanenAktualController.text.trim();
+    final nilai = double.tryParse(text);
+    if (nilai == null) {
+      Get.snackbar(
+        'Data Tidak Valid',
+        'Masukkan angka yang valid untuk hasil panen aktual',
+        backgroundColor: Colors.red.shade400,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(16),
+      );
+      return;
+    }
+
+    setState(() => _isSaving = true);
+
+    try {
+      // 1. Update actual_yield in soybean_prediction
+      final predOk =
+          await _predictionService.updateActualYield(_model.id, nilai);
+
+      // 2. Add/update dataset_soybean with the actual yield
+      final datasetOk = await _datasetService.addOrUpdateByInputs(
+        suhu: _model.suhu,
+        curahHujan: _model.curahHujan,
+        kelembaban: _model.kelembaban,
+        phTanah: _model.phTanah,
+        nitrogen: _model.nitrogen,
+        fosfor: _model.fosfor,
+        kalium: _model.kalium,
+        hasilPanen: nilai,
+      );
+
+      setState(() {
+        _isSaving = false;
+        _model = _model.copyWith(actualYield: nilai);
+      });
+
+      if (predOk && datasetOk) {
+        Get.snackbar(
+          'Berhasil',
+          'Hasil panen aktual $nilai ton/ha telah disimpan dan dataset diperbarui.',
+          backgroundColor: AppColors.primaryGreen,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 4),
+        );
+      } else {
+        Get.snackbar(
+          'Sebagian Gagal',
+          'Hasil aktual disimpan, namun terjadi masalah memperbarui dataset.',
+          backgroundColor: Colors.orange.shade600,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
+          margin: const EdgeInsets.all(16),
+        );
+      }
+    } catch (e) {
+      setState(() => _isSaving = false);
+      Get.snackbar(
+        'Gagal',
+        'Terjadi kesalahan: $e',
+        backgroundColor: Colors.red.shade400,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(16),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final model = Get.arguments as UserPredictionModel;
-
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: const FullscreenAppBar(),
@@ -47,7 +137,7 @@ class _PredictionDetailUserViewState extends State<PredictionDetailUserView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Predictions Detail',
+                  'Detail Prediksi',
                   style: AppTextStyles.appTitle(context),
                 ),
                 const SizedBox(height: 4),
@@ -105,7 +195,7 @@ class _PredictionDetailUserViewState extends State<PredictionDetailUserView> {
                         ),
                         const SizedBox(width: 16),
                         Text(
-                          '${model.result} ton/ha',
+                          '${_model.result} ton/ha',
                           style: AppTextStyles.resultValue(context),
                         ),
                       ],
@@ -136,31 +226,34 @@ class _PredictionDetailUserViewState extends State<PredictionDetailUserView> {
                       children: [
                         DetailRowWidget(
                           label: 'Suhu',
-                          value: '${model.suhu.toStringAsFixed(0)}°C',
+                          value: '${_model.suhu.toStringAsFixed(1)}°C',
                         ),
                         DetailRowWidget(
                           label: 'Curah Hujan',
-                          value: '${model.curahHujan.toStringAsFixed(0)} mm',
+                          value: '${_model.curahHujan.toStringAsFixed(1)} mm',
                         ),
                         DetailRowWidget(
                           label: 'Kelembaban',
-                          value: '${model.kelembaban.toStringAsFixed(0)}%',
+                          value: '${_model.kelembaban.toStringAsFixed(1)}%',
                         ),
                         DetailRowWidget(
                           label: 'pH Tanah',
-                          value: model.phTanah.toStringAsFixed(1),
+                          value: _model.phTanah.toStringAsFixed(2),
                         ),
                         DetailRowWidget(
                           label: 'Nitrogen',
-                          value: '${model.nitrogen.toStringAsFixed(0)} mg/kg',
+                          value:
+                              '${_model.nitrogen.toStringAsFixed(1)} mg/kg',
                         ),
                         DetailRowWidget(
                           label: 'Fosfor',
-                          value: '${model.fosfor.toStringAsFixed(0)} mg/kg',
+                          value:
+                              '${_model.fosfor.toStringAsFixed(1)} mg/kg',
                         ),
                         DetailRowWidget(
                           label: 'Kalium',
-                          value: '${model.kalium.toStringAsFixed(0)} mg/kg',
+                          value:
+                              '${_model.kalium.toStringAsFixed(1)} mg/kg',
                         ),
                       ],
                     ),
@@ -177,7 +270,7 @@ class _PredictionDetailUserViewState extends State<PredictionDetailUserView> {
                   ),
                   const SizedBox(height: 8),
 
-                  // Date chip — full width
+                  // Date chip
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -193,7 +286,7 @@ class _PredictionDetailUserViewState extends State<PredictionDetailUserView> {
                             color: Colors.white, size: 20),
                         const SizedBox(width: 10),
                         Text(
-                          DateFormat('dd/MM/yyyy').format(model.date),
+                          DateFormat('dd/MM/yyyy, HH:mm').format(_model.date),
                           style: AppTextStyles.chipText(context),
                         ),
                       ],
@@ -211,7 +304,7 @@ class _PredictionDetailUserViewState extends State<PredictionDetailUserView> {
                   ),
                   const SizedBox(height: 8),
 
-                  // Aktual harvest input — same color as tanggal prediksi
+                  // Aktual harvest input
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -233,6 +326,7 @@ class _PredictionDetailUserViewState extends State<PredictionDetailUserView> {
                               decimal: true,
                             ),
                             style: AppTextStyles.chipText(context),
+                            onChanged: (_) => setState(() {}),
                             decoration: InputDecoration(
                               hintText: 'e.g. 2.5',
                               hintStyle: AppTextStyles.chipText(context)
@@ -253,38 +347,27 @@ class _PredictionDetailUserViewState extends State<PredictionDetailUserView> {
                   SizedBox(
                     height: 52,
                     child: ElevatedButton.icon(
-                      onPressed: _hasilPanenAktualController.text.isEmpty
+                      onPressed: (_hasilPanenAktualController.text.isEmpty ||
+                              _isSaving)
                           ? null
-                          : () {
-                              final nilai =
-                                  _hasilPanenAktualController.text.trim();
-                              if (nilai.isEmpty ||
-                                  double.tryParse(nilai) == null) {
-                                Get.snackbar(
-                                  'Data Tidak Valid',
-                                  'Masukkan angka yang valid untuk hasil panen aktual',
-                                  backgroundColor: Colors.red.shade400,
-                                  colorText: Colors.white,
-                                  snackPosition: SnackPosition.TOP,
-                                  margin: const EdgeInsets.all(16),
-                                );
-                                return;
-                              }
-                              Get.snackbar(
-                                'Berhasil',
-                                'Hasil panen aktual $nilai ton/ha telah disimpan',
-                                backgroundColor: AppColors.primaryGreen,
-                                colorText: Colors.white,
-                                snackPosition: SnackPosition.TOP,
-                                margin: const EdgeInsets.all(16),
-                              );
-                            },
-                      icon: const Icon(
-                        Icons.save_outlined,
-                        color: Colors.white,
-                      ),
+                          : _saveActualYield,
+                      icon: _isSaving
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Icon(
+                              Icons.save_outlined,
+                              color: Colors.white,
+                            ),
                       label: Text(
-                        'Simpan Hasil Panen Aktual',
+                        _isSaving
+                            ? 'Menyimpan...'
+                            : 'Simpan Hasil Panen Aktual',
                         style: AppTextStyles.buttonText(context),
                       ),
                       style: ElevatedButton.styleFrom(
@@ -308,5 +391,4 @@ class _PredictionDetailUserViewState extends State<PredictionDetailUserView> {
       ),
     );
   }
-
 }

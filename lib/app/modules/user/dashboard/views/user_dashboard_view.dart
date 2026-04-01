@@ -180,26 +180,41 @@ class UserDashboardView extends GetView<UserDashboardController> {
           Text('Prediksi Terakhir', style: AppTextStyles.inputLabel(context)),
           const SizedBox(height: 12),
 
-          // Date chip
-          Obx(() => Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Iconsax.calendar, color: Colors.white, size: 16),
-                    const SizedBox(width: 6),
-                    Text(
-                      controller.lastPredictionDate.value,
-                      style: AppTextStyles.chipText(context),
-                    ),
-                  ],
+          // Date chip — clickable if last prediction exists
+          Obx(() => GestureDetector(
+                onTap: controller.lastPrediction.value != null
+                    ? controller.goToLastPredictionDetail
+                    : null,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: controller.lastPrediction.value != null
+                        ? AppColors.primaryGreen
+                        : AppColors.textSecondary.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Iconsax.calendar,
+                          color: Colors.white, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        controller.lastPredictionDate.value.isEmpty
+                            ? '-'
+                            : controller.lastPredictionDate.value,
+                        style: AppTextStyles.chipText(context),
+                      ),
+                      if (controller.lastPrediction.value != null) ...[
+                        const SizedBox(width: 4),
+                        const Icon(Icons.arrow_forward_ios,
+                            color: Colors.white, size: 12),
+                      ],
+                    ],
+                  ),
                 ),
               )),
           const SizedBox(height: 20),
