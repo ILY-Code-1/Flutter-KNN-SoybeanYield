@@ -2,7 +2,7 @@ name: flutter_knn_soybean
 description: "SoyBeanYield - Soybean Harvest Prediction App using KNN method."
 publish_to: 'none'
 
-version: 1.0.0
+version: 1.0.1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -35,7 +35,7 @@ flutter_launcher_icons:
   image_path: "assets/logo.webp"
   # Warna background icon Android adaptive (format hex, tanpa #).
   # Ganti sesuai warna brand kamu jika ingin background berbeda.
-  adaptive_icon_background: "#2E7D32"
+  adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/logo.webp"
   # Ukuran padding foreground adaptive icon Android (0.0 = full, 1.0 = sangat kecil).
   # Naikkan nilai ini jika logo terpotong di perangkat Android.

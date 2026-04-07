@@ -31,46 +31,40 @@ class FirestorePredictionService {
   // ── Read ──────────────────────────────────────────────────────────────────
 
   /// All predictions for a specific user, ordered newest first.
+  /// Sorting done client-side to avoid needing a composite Firestore index.
   Future<List<UserPredictionModel>> getUserPredictions(String userId) async {
     try {
       final snap = await _db
           .collection(_collection)
           .where('user_id', isEqualTo: userId)
-          .orderBy('timestamp', descending: true)
           .get();
-      return snap.docs.map(UserPredictionModel.fromFirestore).toList();
+      final list = snap.docs.map(UserPredictionModel.fromFirestore).toList();
+      list.sort((a, b) => b.date.compareTo(a.date)); // newest first
+      return list;
     } catch (_) {
       return [];
     }
   }
 
-  Stream<List<UserPredictionModel>> streamUserPredictions(String userId) {
-    return _db
-        .collection(_collection)
-        .where('user_id', isEqualTo: userId)
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .map((snap) =>
-            snap.docs.map(UserPredictionModel.fromFirestore).toList());
-  }
-
   /// Latest single prediction for a user (for dashboard widget).
+  /// Fetches user docs and picks the newest — avoids composite index requirement.
   Future<UserPredictionModel?> getLatestUserPrediction(String userId) async {
     try {
       final snap = await _db
           .collection(_collection)
           .where('user_id', isEqualTo: userId)
-          .orderBy('timestamp', descending: true)
-          .limit(1)
           .get();
       if (snap.docs.isEmpty) return null;
-      return UserPredictionModel.fromFirestore(snap.docs.first);
+      final list = snap.docs.map(UserPredictionModel.fromFirestore).toList();
+      list.sort((a, b) => b.date.compareTo(a.date));
+      return list.first;
     } catch (_) {
       return null;
     }
   }
 
   /// All predictions across all users (admin view), ordered newest first.
+  /// Single-field orderBy on timestamp — uses auto-index, no composite index needed.
   Future<List<PredictionModel>> getAllPredictions() async {
     try {
       final snap = await _db
@@ -81,14 +75,6 @@ class FirestorePredictionService {
     } catch (_) {
       return [];
     }
-  }
-
-  Stream<List<PredictionModel>> streamAllPredictions() {
-    return _db
-        .collection(_collection)
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .map((snap) => snap.docs.map(PredictionModel.fromFirestore).toList());
   }
 
   // ── Count ─────────────────────────────────────────────────────────────────

@@ -20,7 +20,8 @@ class FirestoreDatasetService {
   }
 
   /// Parses CSV content (with header row) and bulk-uploads to Firestore.
-  /// Skips duplicate rows (by all field values). Returns count of added rows.
+  /// Uses a fresh WriteBatch for each chunk of 499 rows (Firestore limit = 500).
+  /// Returns count of added rows.
   Future<int> initializeFromCsv(String csvContent) async {
     final lines = csvContent
         .split('\n')
@@ -33,7 +34,8 @@ class FirestoreDatasetService {
     final dataLines = lines.sublist(1);
     int added = 0;
 
-    final batch = _db.batch();
+    // A committed WriteBatch cannot be reused — always create a new one.
+    WriteBatch batch = _db.batch();
     int batchCount = 0;
 
     for (final line in dataLines) {
@@ -74,14 +76,16 @@ class FirestoreDatasetService {
       batchCount++;
       added++;
 
-      // Firestore batch limit is 500 writes
+      // Firestore limit is 500 writes per batch.
+      // Commit and create a fresh batch before hitting the limit.
       if (batchCount >= 499) {
         await batch.commit();
+        batch = _db.batch(); // ← new batch object required after commit
         batchCount = 0;
       }
-
     }
 
+    // Commit any remaining writes
     if (batchCount > 0) {
       await batch.commit();
     }
