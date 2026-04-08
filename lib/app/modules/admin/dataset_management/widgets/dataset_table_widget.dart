@@ -17,27 +17,29 @@ class DatasetTableWidget extends StatelessWidget {
   });
 
   static const List<String> _headers = [
-    'Suhu',
-    'Curah\nHujan',
-    'Kelembaban',
-    'pH',
-    'Nitrogen',
-    'Fosfor',
-    'Kalium',
-    'Hasil\nPanen',
+    'No',
+    'Suhu\n(°C)',
+    'Curah\nHujan\n(mm)',
+    'Kelembaban\n(%)',
+    'pH\n(-)',
+    'Nitrogen\n(mg/kg)',
+    'Fosfor\n(mg/kg)',
+    'Kalium\n(mg/kg)',
+    'Hasil\nPanen\n(t/ha)',
     'Aksi',
   ];
 
   static const Map<int, TableColumnWidth> _columnWidths = {
-    0: FixedColumnWidth(56),  // Suhu
-    1: FixedColumnWidth(72),  // Curah Hujan
-    2: FixedColumnWidth(80),  // Kelembaban
-    3: FixedColumnWidth(48),  // pH
-    4: FixedColumnWidth(68),  // Nitrogen
-    5: FixedColumnWidth(60),  // Fosfor
-    6: FixedColumnWidth(60),  // Kalium
-    7: FixedColumnWidth(72),  // Hasil Panen
-    8: FixedColumnWidth(48),  // Aksi
+    0: FixedColumnWidth(36),  // No
+    1: FixedColumnWidth(56),  // Suhu
+    2: FixedColumnWidth(72),  // Curah Hujan
+    3: FixedColumnWidth(80),  // Kelembaban
+    4: FixedColumnWidth(48),  // pH
+    5: FixedColumnWidth(68),  // Nitrogen
+    6: FixedColumnWidth(60),  // Fosfor
+    7: FixedColumnWidth(60),  // Kalium
+    8: FixedColumnWidth(72),  // Hasil Panen
+    9: FixedColumnWidth(48),  // Aksi
   };
 
   @override
@@ -87,21 +89,26 @@ class DatasetTableWidget extends StatelessWidget {
                           .toList(),
                     ),
                     // Data rows
-                    ...datasets.map(
-                      (d) => TableRow(
-                        children: [
-                          _dataCell(context, d.suhu.toStringAsFixed(0)),
-                          _dataCell(context, d.curahHujan.toStringAsFixed(0)),
-                          _dataCell(context, d.kelembaban.toStringAsFixed(0)),
-                          _dataCell(context, d.phTanah.toStringAsFixed(1)),
-                          _dataCell(context, d.nitrogen.toStringAsFixed(0)),
-                          _dataCell(context, d.fosfor.toStringAsFixed(0)),
-                          _dataCell(context, d.kalium.toStringAsFixed(0)),
-                          _dataCell(context,
-                              '${d.hasilPanen.toStringAsFixed(2)} t'),
-                          _actionCell(context, d),
-                        ],
-                      ),
+                    ...datasets.asMap().entries.map(
+                      (entry) {
+                        final index = entry.key;
+                        final d = entry.value;
+                        return TableRow(
+                          children: [
+                            _dataCell(context, '${index + 1}'),
+                            _dataCell(context, d.suhu.toStringAsFixed(0)),
+                            _dataCell(context, d.curahHujan.toStringAsFixed(0)),
+                            _dataCell(context, d.kelembaban.toStringAsFixed(0)),
+                            _dataCell(context, d.phTanah.toStringAsFixed(1)),
+                            _dataCell(context, d.nitrogen.toStringAsFixed(0)),
+                            _dataCell(context, d.fosfor.toStringAsFixed(0)),
+                            _dataCell(context, d.kalium.toStringAsFixed(0)),
+                            _dataCell(context,
+                                d.hasilPanen.toStringAsFixed(2)),
+                            _actionCell(context, d),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -112,7 +119,7 @@ class DatasetTableWidget extends StatelessWidget {
 
   Widget _headerCell(BuildContext context, String text) {
     return Container(
-      height: 44,
+      height: 58,
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Text(

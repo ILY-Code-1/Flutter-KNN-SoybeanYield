@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -342,6 +343,52 @@ class DatasetManagementController extends GetxController {
       Get.snackbar(
         'Gagal',
         'Terjadi kesalahan saat memproses file: $e',
+        backgroundColor: Colors.red.shade400,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+        margin: const EdgeInsets.all(16),
+      );
+    }
+  }
+
+  // ── Download sample file ─────────────────────────────────────────────────
+
+  Future<void> downloadSampleFile() async {
+    const sampleContent =
+        'suhu,curah_hujan,kelembaban,ph_tanah,nitrogen,fosfor,kalium,hasil_panen\n'
+        '28,850,70,6.5,40,20,150,2.50\n'
+        '30,900,75,6.2,35,18,130,2.30\n'
+        '27,800,68,6.8,45,22,160,2.70\n'
+        '32,950,80,5.9,30,15,120,2.10\n'
+        '29,880,72,6.4,38,19,145,2.45\n'
+        '31,920,77,6.1,33,17,135,2.20\n'
+        '26,780,65,7.0,48,25,170,2.85\n'
+        '33,1000,82,5.7,28,13,110,1.95\n'
+        '28,860,71,6.6,41,21,152,2.55\n'
+        '30,910,74,6.3,36,19,142,2.40\n';
+
+    try {
+      final bytes = Uint8List.fromList(sampleContent.codeUnits);
+      final result = await FilePicker.platform.saveFile(
+        dialogTitle: 'Simpan contoh file dataset',
+        fileName: 'contoh_dataset_kedelai.txt',
+        bytes: bytes,
+      );
+
+      if (result != null) {
+        Get.snackbar(
+          'Berhasil',
+          'File contoh dataset berhasil disimpan',
+          backgroundColor: AppColors.primaryGreen,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
+          margin: const EdgeInsets.all(16),
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Gagal',
+        'Tidak dapat menyimpan file contoh: $e',
         backgroundColor: Colors.red.shade400,
         colorText: Colors.white,
         snackPosition: SnackPosition.TOP,

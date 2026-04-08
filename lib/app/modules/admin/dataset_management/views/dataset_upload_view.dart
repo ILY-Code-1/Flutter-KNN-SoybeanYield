@@ -47,6 +47,10 @@ class DatasetUploadView extends GetView<DatasetManagementController> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // ── Tutorial section ───────────────────────────────────
+                      _buildTutorialSection(context),
+                      const SizedBox(height: 20),
+
                       // ── Upload zone — tap untuk buka file manager ──────────
                       GestureDetector(
                         onTap: controller.pickFile,
@@ -205,6 +209,151 @@ class DatasetUploadView extends GetView<DatasetManagementController> {
     );
   }
 
+  Widget _buildTutorialSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // ── Title ──
+        Row(
+          children: [
+            const Icon(Icons.info_outline_rounded,
+                color: AppColors.primaryGreen, size: 18),
+            const SizedBox(width: 6),
+            Text(
+              'Panduan Menyiapkan File Dataset',
+              style: AppTextStyles.sectionTitle(context)
+                  .copyWith(fontSize: 13, color: AppColors.primaryGreen),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        // ── Format info box ──
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF1F8E9),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFA5D6A7), width: 1),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _tutorialItem(context, '1',
+                  'Format file: TXT atau CSV dengan pemisah koma (,)'),
+              _tutorialItem(context, '2',
+                  'Baris pertama boleh berisi header (akan dilewati otomatis)'),
+              _tutorialItem(context, '3',
+                  'Urutan kolom harus sesuai:\nsuhu, curah_hujan, kelembaban, ph_tanah, nitrogen, fosfor, kalium, hasil_panen'),
+              _tutorialItem(context, '4', 'Satuan masing-masing kolom:',
+                  detail: true),
+              Padding(
+                padding: const EdgeInsets.only(left: 24, top: 4, bottom: 2),
+                child: Table(
+                  columnWidths: const {
+                    0: FlexColumnWidth(1.4),
+                    1: FlexColumnWidth(1),
+                  },
+                  children: const [
+                    TableRow(children: [
+                      _TableCell(text: 'Suhu', bold: true),
+                      _TableCell(text: '°C'),
+                    ]),
+                    TableRow(children: [
+                      _TableCell(text: 'Curah Hujan', bold: true),
+                      _TableCell(text: 'mm'),
+                    ]),
+                    TableRow(children: [
+                      _TableCell(text: 'Kelembaban', bold: true),
+                      _TableCell(text: '%'),
+                    ]),
+                    TableRow(children: [
+                      _TableCell(text: 'pH Tanah', bold: true),
+                      _TableCell(text: '- (tanpa satuan, misal: 6.5)'),
+                    ]),
+                    TableRow(children: [
+                      _TableCell(text: 'Nitrogen', bold: true),
+                      _TableCell(text: 'mg/kg'),
+                    ]),
+                    TableRow(children: [
+                      _TableCell(text: 'Fosfor', bold: true),
+                      _TableCell(text: 'mg/kg'),
+                    ]),
+                    TableRow(children: [
+                      _TableCell(text: 'Kalium', bold: true),
+                      _TableCell(text: 'mg/kg'),
+                    ]),
+                    TableRow(children: [
+                      _TableCell(text: 'Hasil Panen', bold: true),
+                      _TableCell(text: 't/ha'),
+                    ]),
+                  ],
+                ),
+              ),
+              _tutorialItem(context, '5',
+                  'Contoh baris data:\n28,850,70,6.5,40,20,150,2.50'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // ── Download sample button ──
+        OutlinedButton.icon(
+          onPressed: controller.downloadSampleFile,
+          icon: const Icon(Icons.download_rounded,
+              color: AppColors.primaryGreen, size: 18),
+          label: Text(
+            'Download Contoh File Dataset',
+            style: AppTextStyles.inputLabel(context)
+                .copyWith(color: AppColors.primaryGreen),
+          ),
+          style: OutlinedButton.styleFrom(
+            side: const BorderSide(color: AppColors.primaryGreen, width: 1.2),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _tutorialItem(BuildContext context, String number, String text,
+      {bool detail = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 18,
+            height: 18,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: AppColors.primaryGreen,
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              number,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              text,
+              style: AppTextStyles.detailLabel(context).copyWith(fontSize: 11),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildHeader(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -220,6 +369,28 @@ class DatasetUploadView extends GetView<DatasetManagementController> {
             style: AppTextStyles.appSubtitle(context),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _TableCell extends StatelessWidget {
+  final String text;
+  final bool bold;
+
+  const _TableCell({required this.text, this.bold = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 10.5,
+          color: const Color(0xFF424242),
+          fontWeight: bold ? FontWeight.w600 : FontWeight.normal,
+        ),
       ),
     );
   }
