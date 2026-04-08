@@ -51,6 +51,8 @@ class SoyBeanYieldApp extends StatelessWidget {
       ),
       initialRoute: AppRoutes.signIn,
       getPages: AppPages.routes,
+      defaultTransition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 220),
     );
   }
 }

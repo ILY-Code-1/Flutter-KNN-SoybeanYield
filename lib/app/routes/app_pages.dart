@@ -35,57 +35,66 @@ class AppPages {
     ),
 
     // ── Admin ─────────────────────────────────────────────────────────────────
+    // Bottom-nav pages use noTransition so switching tabs feels native (instant)
     GetPage(
       name: AppRoutes.adminDashboard,
       page: () => const DashboardView(),
       binding: DashboardBinding(),
       middlewares: [AuthMiddleware()],
+      transition: Transition.noTransition,
     ),
     GetPage(
       name: AppRoutes.adminUserManagement,
       page: () => const UserManagementView(),
       binding: UserManagementBinding(),
       middlewares: [AuthMiddleware()],
+      transition: Transition.noTransition,
     ),
     GetPage(
       name: AppRoutes.adminUserDetail,
       page: () => const UserDetailView(),
       binding: UserManagementBinding(),
       middlewares: [AuthMiddleware()],
-      fullscreenDialog: true,
+      transition: Transition.downToUp,
+      transitionDuration: const Duration(milliseconds: 280),
     ),
     GetPage(
       name: AppRoutes.adminDatasetManagement,
       page: () => const DatasetManagementView(),
       binding: DatasetManagementBinding(),
       middlewares: [AuthMiddleware()],
+      transition: Transition.noTransition,
     ),
     GetPage(
       name: AppRoutes.adminDatasetManual,
       page: () => const DatasetManualView(),
       binding: DatasetManagementBinding(),
       middlewares: [AuthMiddleware()],
-      fullscreenDialog: true,
+      transition: Transition.downToUp,
+      transitionDuration: const Duration(milliseconds: 280),
     ),
     GetPage(
       name: AppRoutes.adminDatasetUpload,
       page: () => const DatasetUploadView(),
       binding: DatasetManagementBinding(),
       middlewares: [AuthMiddleware()],
-      fullscreenDialog: true,
+      transition: Transition.downToUp,
+      transitionDuration: const Duration(milliseconds: 280),
     ),
     GetPage(
       name: AppRoutes.adminPredictionHistory,
       page: () => const HistoryView(),
       binding: PredictionHistoryBinding(),
       middlewares: [AuthMiddleware()],
+      transition: Transition.noTransition,
     ),
     GetPage(
       name: AppRoutes.adminPredictionDetail,
       page: () => const PredictionDetailView(),
       binding: PredictionHistoryBinding(),
       middlewares: [AuthMiddleware()],
-      fullscreenDialog: true,
+      transition: Transition.downToUp,
+      transitionDuration: const Duration(milliseconds: 280),
     ),
 
     // ── User (Petani) ─────────────────────────────────────────────────────────
@@ -94,26 +103,30 @@ class AppPages {
       page: () => const UserDashboardView(),
       binding: UserDashboardBinding(),
       middlewares: [AuthMiddleware()],
+      transition: Transition.noTransition,
     ),
     GetPage(
       name: AppRoutes.userInputPrediksi,
       page: () => const InputPrediksiView(),
       binding: PredictionBinding(),
       middlewares: [AuthMiddleware()],
-      fullscreenDialog: true,
+      transition: Transition.downToUp,
+      transitionDuration: const Duration(milliseconds: 280),
     ),
     GetPage(
       name: AppRoutes.userPredictionDetail,
       page: () => const PredictionDetailUserView(),
       // No binding — data passed entirely via Get.arguments
       middlewares: [AuthMiddleware()],
-      fullscreenDialog: true,
+      transition: Transition.downToUp,
+      transitionDuration: const Duration(milliseconds: 280),
     ),
     GetPage(
       name: AppRoutes.userHistory,
       page: () => const UserHistoryView(),
       binding: UserHistoryBinding(),
       middlewares: [AuthMiddleware()],
+      transition: Transition.noTransition,
     ),
   ];
 }
